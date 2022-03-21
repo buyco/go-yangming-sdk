@@ -1,0 +1,398 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: itcs@yangming.com
+    name: Yang Ming Marine Transport
+  description: API specifications for the Track and Trace interface standard
+  license:
+    name: Yang Ming Marine Transport - Website
+    url: https://www.yangming.com
+  title: Yang Ming Track and Trace API
+  version: DCSA Standard
+servers:
+- url: https://api.yangming.com/open/dcsa/api/tnt
+tags:
+- description: Event operations
+  name: Events
+paths:
+  /1.1.0/events:
+    get:
+      description: Returns all events related to the query parameter. The endpoint
+        requires at least 1 of the 3 query parameters to be used.
+      operationId: v110GGetEvents
+      parameters:
+      - explode: false
+        in: header
+        name: KeyId
+        required: false
+        schema:
+          default: Assigned API Key
+          type: string
+        style: simple
+      - description: The identifier for a shipment, which is issued by and unique
+          within each of the carriers.
+        example: E123456789
+        explode: true
+        in: query
+        name: bookingReference
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Bill of lading number is an identifier that links to a shipment.
+          Bill of Lading is the legal document issued to the customer, which confirms
+          the carrier's receipt of the cargo from the customer acknowledging goods
+          being shipped and specifying the terms of delivery.
+        example: W123456789
+        explode: true
+        in: query
+        name: billOfLadingNumber
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: The unique identifier for the equipment, which should follow
+          the BIC ISO Container Identification Number where possible.
+        example: YMLU1234567
+        explode: true
+        in: query
+        name: equipmentReference
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/events'
+          description: Successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+          description: Unexpected error
+      summary: Find events by Booking Reference, Bill of Lading or Equipment Reference.
+      tags:
+      - Events
+components:
+  schemas:
+    equipmentEvent:
+      description: The equipment event entity is a specialization of the event entity
+        to support specification of data that only applies to an equipment event.
+      properties:
+        eventID:
+          description: The unique identifier for the Equipment Event ID/Transport
+            Event ID/Shipment Event ID.
+          example: CTR_689389697_7
+          type: string
+        eventDateTime:
+          description: The local date and time, where the event took place, in ISO
+            8601 format.
+          example: 2019-11-12T07:41:00+08:30
+          format: date-time
+          type: string
+        eventClassifierCode:
+          description: Code for the event classifier, either PLN, ACT or EST.
+          example: ACT
+          type: string
+        eventTypeCode:
+          description: Unique identifier for Event Type Code.
+          example: ARRI
+          type: string
+        equipmentReference:
+          description: The unique identifier for the equipment, which should follow
+            the BIC ISO Container Identification Number where possible. If a container
+            is not yet assigned to a shipment, the interface cannot return any information
+            when an equipment reference is given as input. If a container is assigned
+            to an (active) shipment, the interface returns information on the active
+            shipment.
+          example: YMLU1234567
+          type: string
+        facilityTypeCode:
+          description: The code to identify the specific type of facility.
+          example: POTE
+          type: string
+        UNLocationCode:
+          description: The UN Location Code identifies a location in the sense of
+            a city/a town/a village, being the smaller administrative area existing
+            as defined by the competent national authority in each country.
+          example: USNYC
+          type: string
+        facilityCode:
+          description: The code used for identifying the specific facility.
+          example: AEAUHADT
+          type: string
+        otherFacility:
+          description: An alternative way to capture the facility when no standardized
+            DCSA facility code can be found.
+          example: Depot location or address
+          type: string
+        emptyIndicatorCode:
+          description: Code to denote whether the equipment is empty or laden.
+          example: Empty
+          type: string
+      required:
+      - UNLocationCode
+      - emptyIndicatorCode
+      - equipmentReference
+      - eventClassifierCode
+      - eventDateTime
+      - eventID
+      - eventTypeCode
+      - facilityCode
+      - facilityTypeCode
+      type: object
+    event:
+      anyOf:
+      - $ref: '#/components/schemas/equipmentEvent'
+      - $ref: '#/components/schemas/transportEvent'
+      - $ref: '#/components/schemas/transportEquipmentEvent'
+      type: object
+    events:
+      description: List of events for shipment journey.
+      example:
+        events:
+        - null
+        - null
+      properties:
+        events:
+          items:
+            $ref: '#/components/schemas/event'
+          type: array
+      required:
+      - events
+      type: object
+    transportEquipmentEvent:
+      description: The transport equipment event entity is a specialization of the
+        event entity to support specification of data that applies to both transport
+        and equipment events.
+      properties:
+        eventID:
+          description: The unique identifier for the Equipment Event ID/Transport
+            Event ID/Shipment Event ID.
+          example: CTR_689389697_7
+          type: string
+        eventDateTime:
+          description: The local date and time, where the event took place, in ISO
+            8601 format.
+          example: 2019-11-12T07:41:00+08:30
+          format: date-time
+          type: string
+        eventClassifierCode:
+          description: Code for the event classifier, either PLN, ACT or EST.
+          example: ACT
+          type: string
+        eventTypeCode:
+          description: Unique identifier for Event Type Code.
+          example: ARRI
+          type: string
+        transportReference:
+          description: The reference for the transport, e.g. when the mode of transport
+            is a vessel, the transport reference will be the vessel IMO number.
+          example: "9648714"
+          type: string
+        transportLegReference:
+          description: |-
+            The transport leg reference will be specific per mode of transport:
+
+            Vessel: Voyage number as specified by the vessel operator
+
+            Truck: Not yet specified
+
+            Rail: Not yet specified
+
+            Barge: Not yet specified.
+          example: 025E
+          type: string
+        equipmentReference:
+          description: The unique identifier for the equipment, which should follow
+            the BIC ISO Container Identification Number where possible. If a container
+            is not yet assigned to a shipment, the interface cannot return any information
+            when an equipment reference is given as input. If a container is assigned
+            to an (active) shipment, the interface returns information on the active
+            shipment.
+          example: YMLU1234567
+          type: string
+        facilityTypeCode:
+          description: The code to identify the specific type of facility.
+          example: POTE
+          type: string
+        UNLocationCode:
+          description: The UN Location Code identifies a location in the sense of
+            a city/a town/a village, being the smaller administrative area existing
+            as defined by the competent national authority in each country.
+          example: USNYC
+          type: string
+        facilityCode:
+          description: The code used for identifying the specific facility.
+          example: AEAUHADT
+          type: string
+        otherFacility:
+          description: An alternative way to capture the facility when no standardized
+            DCSA facility code can be found.
+          example: Depot location or address
+          type: string
+        emptyIndicatorCode:
+          description: Code to denote whether the equipment is empty or laden.
+          example: Empty
+          type: string
+        modeOfTransportCode:
+          description: A code specifying a type of transport mode.
+          example: "1"
+          type: string
+      required:
+      - UNLocationCode
+      - emptyIndicatorCode
+      - equipmentReference
+      - eventClassifierCode
+      - eventDateTime
+      - eventID
+      - eventTypeCode
+      - facilityCode
+      - facilityTypeCode
+      - modeOfTransportCode
+      - transportLegReference
+      - transportReference
+      type: object
+    transportEvent:
+      description: The transport event entity is a specialization of the event entity
+        to support specification of data that only applies to a transport event.
+      properties:
+        eventID:
+          description: The unique identifier for the Equipment Event ID/Transport
+            Event ID/Shipment Event ID.
+          example: CTR_689389697_7
+          type: string
+        eventDateTime:
+          description: The local date and time, where the event took place, in ISO
+            8601 format.
+          example: 2019-11-12T07:41:00+08:30
+          format: date-time
+          type: string
+        eventClassifierCode:
+          description: Code for the event classifier, either PLN, ACT or EST.
+          example: ACT
+          type: string
+        eventTypeCode:
+          description: Unique identifier for Event Type Code.
+          example: ARRI
+          type: string
+        transportReference:
+          description: The reference for the transport, e.g. when the mode of transport
+            is a vessel, the transport reference will be the vessel IMO number.
+          example: "9648714"
+          type: string
+        transportLegReference:
+          description: |-
+            The transport leg reference will be specific per mode of transport:
+
+            Vessel: Voyage number as specified by the vessel operator
+
+            Truck: Not yet specified
+
+            Rail: Not yet specified
+
+            Barge: Not yet specified.
+          example: 025E
+          type: string
+        facilityTypeCode:
+          description: The code to identify the specific type of facility.
+          example: POTE
+          type: string
+        UNLocationCode:
+          description: The UN Location Code identifies a location in the sense of
+            a city/a town/a village, being the smaller administrative area existing
+            as defined by the competent national authority in each country.
+          example: USNYC
+          type: string
+        facilityCode:
+          description: The code used for identifying the specific facility.
+          example: AEAUHADT
+          type: string
+        otherFacility:
+          description: An alternative way to capture the facility when no standardized
+            DCSA facility code can be found.
+          example: Depot location or address
+          type: string
+        modeOfTransportCode:
+          description: A code specifying a type of transport mode.
+          example: "1"
+          type: string
+      required:
+      - UNLocationCode
+      - eventClassifierCode
+      - eventDateTime
+      - eventID
+      - eventTypeCode
+      - facilityCode
+      - facilityTypeCode
+      - modeOfTransportCode
+      - transportLegReference
+      - transportReference
+      type: object
+    error:
+      properties:
+        httpMethod:
+          description: The HTTP request method type.
+          example: GET
+          type: string
+        requestUri:
+          description: The request URI.
+          example: https://api.yangming.com/open/dcsa/api/tnt/1.1.0/events
+          type: string
+        errors:
+          items:
+            $ref: '#/components/schemas/errors'
+          type: array
+        statusCode:
+          description: The HTTP status code.
+          example: 400
+          format: int32
+          type: integer
+        statusCodeText:
+          description: The textual representation of the response status.
+          example: Bad Request
+          type: string
+        errorDateTime:
+          description: The date and time (in ISO 8601 format) the error occured.
+          example: 2020-12-17T09:57:25+08:00
+          type: string
+      required:
+      - errorDateTime
+      - errors
+      - httpMethod
+      - requestUri
+      - statusCode
+      - statusCodeText
+      type: object
+    errors:
+      properties:
+        reason:
+          description: |-
+            High level error message:
+
+             1.invalidQuery
+
+             2.noDataFound
+
+             3.systemException.
+          example: systemException
+          type: string
+        message:
+          description: |-
+            Detailed error message:
+
+             1.invalidQuery: The request did not contain one of the three required query parameters.
+
+             2.noDataFound: No data found for given parameters.
+
+             3.systemException: Exception occurs when calling the API.
+          example: Exception occurs when calling the API.
+          type: string
+      required:
+      - message
+      - reason
+      type: object

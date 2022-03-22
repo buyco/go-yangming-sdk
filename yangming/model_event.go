@@ -33,10 +33,29 @@ func (dst *Event) UnmarshalJSON(data []byte) error {
 		if string(jsonEquipmentEvent) == "{}" { // empty struct
 			dst.EquipmentEvent = nil
 		} else {
-			return nil // data stored in dst.EquipmentEvent, return on the first match
+			if dst.EquipmentEvent.EquipmentReference != "" {
+				return nil // data stored in dst.EquipmentEvent, return on the first match
+			}
+			dst.EquipmentEvent = nil
 		}
 	} else {
 		dst.EquipmentEvent = nil
+	}
+
+	// try to unmarshal JSON data into TransportEvent
+	err = json.Unmarshal(data, &dst.TransportEvent);
+	if err == nil {
+		jsonTransportEvent, _ := json.Marshal(dst.TransportEvent)
+		if string(jsonTransportEvent) == "{}" { // empty struct
+			dst.TransportEvent = nil
+		} else {
+			if dst.TransportEvent.TransportReference != "" {
+				return nil // data stored in dst.TransportEvent, return on the first match
+			}
+			dst.TransportEvent = nil
+		}
+	} else {
+		dst.TransportEvent = nil
 	}
 
 	// try to unmarshal JSON data into TransportEquipmentEvent
@@ -50,19 +69,6 @@ func (dst *Event) UnmarshalJSON(data []byte) error {
 		}
 	} else {
 		dst.TransportEquipmentEvent = nil
-	}
-
-	// try to unmarshal JSON data into TransportEvent
-	err = json.Unmarshal(data, &dst.TransportEvent);
-	if err == nil {
-		jsonTransportEvent, _ := json.Marshal(dst.TransportEvent)
-		if string(jsonTransportEvent) == "{}" { // empty struct
-			dst.TransportEvent = nil
-		} else {
-			return nil // data stored in dst.TransportEvent, return on the first match
-		}
-	} else {
-		dst.TransportEvent = nil
 	}
 
 	return fmt.Errorf("Data failed to match schemas in anyOf(Event)")

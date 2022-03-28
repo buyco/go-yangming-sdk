@@ -34,7 +34,7 @@ func (dst *Event) UnmarshalJSON(data []byte) error {
 		if string(jsonTransportEquipmentEvent) == "{}" { // empty struct
 			dst.TransportEquipmentEvent = nil
 		} else {
-			if dst.EquipmentEvent.EquipmentReference != "" && dst.TransportEvent.TransportReference != "" {
+			if dst.TransportEquipmentEvent.EquipmentReference != "" && dst.TransportEquipmentEvent.TransportReference != "" {
 				return nil // data stored in dst.TransportEquipmentEvent, return on the first match
 			}
 			dst.TransportEquipmentEvent = nil

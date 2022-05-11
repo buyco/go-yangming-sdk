@@ -28,7 +28,7 @@ func (dst *Event) UnmarshalJSON(data []byte) error {
 	var err error
 
 	// try to unmarshal JSON data into TransportEquipmentEvent
-	err = json.Unmarshal(data, &dst.TransportEquipmentEvent);
+	err = json.Unmarshal(data, &dst.TransportEquipmentEvent)
 	if err == nil {
 		jsonTransportEquipmentEvent, _ := json.Marshal(dst.TransportEquipmentEvent)
 		if string(jsonTransportEquipmentEvent) == "{}" { // empty struct
@@ -44,7 +44,7 @@ func (dst *Event) UnmarshalJSON(data []byte) error {
 	}
 
 	// try to unmarshal JSON data into EquipmentEvent
-	err = json.Unmarshal(data, &dst.EquipmentEvent);
+	err = json.Unmarshal(data, &dst.EquipmentEvent)
 	if err == nil {
 		jsonEquipmentEvent, _ := json.Marshal(dst.EquipmentEvent)
 		if string(jsonEquipmentEvent) == "{}" { // empty struct
@@ -60,7 +60,7 @@ func (dst *Event) UnmarshalJSON(data []byte) error {
 	}
 
 	// try to unmarshal JSON data into TransportEvent
-	err = json.Unmarshal(data, &dst.TransportEvent);
+	err = json.Unmarshal(data, &dst.TransportEvent)
 	if err == nil {
 		jsonTransportEvent, _ := json.Marshal(dst.TransportEvent)
 		if string(jsonTransportEvent) == "{}" { // empty struct
@@ -73,6 +73,22 @@ func (dst *Event) UnmarshalJSON(data []byte) error {
 		}
 	} else {
 		dst.TransportEvent = nil
+	}
+
+	// ultimately try to unmarshal JSON data into TransportEquipmentEvent without check on data completeness
+	err = json.Unmarshal(data, &dst.TransportEquipmentEvent)
+	if err != nil {
+		return err
+	}
+	if err == nil {
+		jsonTransportEquipmentEvent, _ := json.Marshal(dst.TransportEquipmentEvent)
+		if string(jsonTransportEquipmentEvent) == "{}" { // empty struct
+			dst.TransportEquipmentEvent = nil
+		} else {
+			return nil // data stored in dst.TransportEquipmentEvent, return on the first match
+		}
+	} else {
+		dst.TransportEquipmentEvent = nil
 	}
 
 	return fmt.Errorf("Data failed to match schemas in anyOf(Event)")

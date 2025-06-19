@@ -32,7 +32,7 @@
         ],
         "summary": "Find events.",
         "description": "Returns all events filtered by the queryParameters. The endpoint requires at least 1 of the 3 query parameters. (Carrier Booking Reference, Equipment Reference, Transport Document Reference) \n\n**NB**: It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting. \n\nExample: *shipmentEventTypeCode=DRFT and equipmentEventTypeCode=GTIN* \n\nSince there is no event that can be a ShipmentEvent and an EquipmentEvent at the same time **this will return an empty list!**\n",
-        "operationId": "V220GetEvents",
+        "operationId": "GetEvents",
         "parameters": [
           {
             "name": "KeyId",
@@ -176,7 +176,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/error"
+                  "$ref": "#/components/schemas/apiError"
                 }
               }
             }
@@ -624,7 +624,7 @@
         },
         "description": "describes a floating, sea going structure (mother vessels and feeder vessels) with either an internal or external mode of propulsion designed for the transport of cargo and/or passengers. Ocean vessels are uniquely identified by an IMO number consisting of 7 digits, or alternatively by their AIS signal with an MMSI number."
       },
-      "error": {
+      "apiError": {
         "required": [
           "errorDateTime",
           "errors",

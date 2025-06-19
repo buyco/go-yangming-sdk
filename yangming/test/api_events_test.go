@@ -22,11 +22,11 @@ func Test_yangming_EventsAPIService(t *testing.T) {
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
-	t.Run("Test EventsAPIService V220GetEvents", func(t *testing.T) {
+	t.Run("Test EventsAPIService GetEvents", func(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		resp, httpRes, err := apiClient.EventsAPI.V220GetEvents(context.Background()).Execute()
+		resp, httpRes, err := apiClient.EventsAPI.GetEvents(context.Background()).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

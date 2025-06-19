@@ -4,13 +4,13 @@ All URIs are relative to *https://apidoc.yangming.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**V220GetEvents**](EventsAPI.md#V220GetEvents) | **Get** /v2/events | Find events.
+[**GetEvents**](EventsAPI.md#GetEvents) | **Get** /v2/events | Find events.
 
 
 
-## V220GetEvents
+## GetEvents
 
-> Events V220GetEvents(ctx).KeyId(keyId).CarrierBookingReference(carrierBookingReference).TransportDocumentReference(transportDocumentReference).EquipmentReference(equipmentReference).TransportEventTypeCode(transportEventTypeCode).VesselIMONumber(vesselIMONumber).TransportCallID(transportCallID).ExportVoyageNumber(exportVoyageNumber).EquipmentEventTypeCode(equipmentEventTypeCode).CarrierServiceCode(carrierServiceCode).EventType(eventType).UNLocationCode(uNLocationCode).Execute()
+> Events GetEvents(ctx).KeyId(keyId).CarrierBookingReference(carrierBookingReference).TransportDocumentReference(transportDocumentReference).EquipmentReference(equipmentReference).TransportEventTypeCode(transportEventTypeCode).VesselIMONumber(vesselIMONumber).TransportCallID(transportCallID).ExportVoyageNumber(exportVoyageNumber).EquipmentEventTypeCode(equipmentEventTypeCode).CarrierServiceCode(carrierServiceCode).EventType(eventType).UNLocationCode(uNLocationCode).Execute()
 
 Find events.
 
@@ -44,13 +44,13 @@ func main() {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
-	resp, r, err := apiClient.EventsAPI.V220GetEvents(context.Background()).KeyId(keyId).CarrierBookingReference(carrierBookingReference).TransportDocumentReference(transportDocumentReference).EquipmentReference(equipmentReference).TransportEventTypeCode(transportEventTypeCode).VesselIMONumber(vesselIMONumber).TransportCallID(transportCallID).ExportVoyageNumber(exportVoyageNumber).EquipmentEventTypeCode(equipmentEventTypeCode).CarrierServiceCode(carrierServiceCode).EventType(eventType).UNLocationCode(uNLocationCode).Execute()
+	resp, r, err := apiClient.EventsAPI.GetEvents(context.Background()).KeyId(keyId).CarrierBookingReference(carrierBookingReference).TransportDocumentReference(transportDocumentReference).EquipmentReference(equipmentReference).TransportEventTypeCode(transportEventTypeCode).VesselIMONumber(vesselIMONumber).TransportCallID(transportCallID).ExportVoyageNumber(exportVoyageNumber).EquipmentEventTypeCode(equipmentEventTypeCode).CarrierServiceCode(carrierServiceCode).EventType(eventType).UNLocationCode(uNLocationCode).Execute()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error when calling `EventsAPI.V220GetEvents``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error when calling `EventsAPI.GetEvents``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
-	// response from `V220GetEvents`: Events
-	fmt.Fprintf(os.Stdout, "Response from `EventsAPI.V220GetEvents`: %v\n", resp)
+	// response from `GetEvents`: Events
+	fmt.Fprintf(os.Stdout, "Response from `EventsAPI.GetEvents`: %v\n", resp)
 }
 ```
 
@@ -60,7 +60,7 @@ func main() {
 
 ### Other Parameters
 
-Other parameters are passed through a pointer to a apiV220GetEventsRequest struct via the builder pattern
+Other parameters are passed through a pointer to a apiGetEventsRequest struct via the builder pattern
 
 
 Name | Type | Description  | Notes

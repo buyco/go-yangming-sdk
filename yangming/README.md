@@ -78,18 +78,18 @@ All URIs are relative to *https://apidoc.yangming.com*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*EventsAPI* | [**V220GetEvents**](docs/EventsAPI.md#v220getevents) | **Get** /v2/events | Find events.
+*EventsAPI* | [**GetEvents**](docs/EventsAPI.md#getevents) | **Get** /v2/events | Find events.
 
 
 ## Documentation For Models
 
  - [Address](docs/Address.md)
+ - [ApiError](docs/ApiError.md)
  - [DocumentReferences](docs/DocumentReferences.md)
  - [EquipmentEvent](docs/EquipmentEvent.md)
  - [Event](docs/Event.md)
  - [Events](docs/Events.md)
  - [Location](docs/Location.md)
- - [ModelError](docs/ModelError.md)
  - [References](docs/References.md)
  - [Seal](docs/Seal.md)
  - [SubErrors](docs/SubErrors.md)

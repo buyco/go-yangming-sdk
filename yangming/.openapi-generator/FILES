@@ -7,13 +7,13 @@ api_events.go
 client.go
 configuration.go
 docs/Address.md
+docs/ApiError.md
 docs/DocumentReferences.md
 docs/EquipmentEvent.md
 docs/Event.md
 docs/Events.md
 docs/EventsAPI.md
 docs/Location.md
-docs/ModelError.md
 docs/References.md
 docs/Seal.md
 docs/SubErrors.md
@@ -24,9 +24,9 @@ git_push.sh
 go.mod
 go.sum
 model_address.go
+model_api_error.go
 model_document_references.go
 model_equipment_event.go
-model_error.go
 model_event.go
 model_events.go
 model_location.go

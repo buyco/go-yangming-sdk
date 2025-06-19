@@ -25,7 +25,7 @@ paths:
         \ \n\nExample: *shipmentEventTypeCode=DRFT and equipmentEventTypeCode=GTIN*\
         \ \n\nSince there is no event that can be a ShipmentEvent and an EquipmentEvent\
         \ at the same time **this will return an empty list!**\n"
-      operationId: V220GetEvents
+      operationId: GetEvents
       parameters:
       - explode: false
         in: header
@@ -191,7 +191,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/error'
+                $ref: '#/components/schemas/apiError'
           description: Unexpected error
       summary: Find events.
       tags:
@@ -910,7 +910,7 @@ components:
       required:
       - vesselIMONumber
       type: object
-    error:
+    apiError:
       example:
         statusCodeText: Bad Request
         errorDateTime: 2023-12-17T09:57:25+08:00

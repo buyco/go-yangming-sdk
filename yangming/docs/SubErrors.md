@@ -1,67 +1,67 @@
-# Errors
+# SubErrors
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Reason** | **string** | High level error message:   1.invalidQuery   2.noDataFound   3.systemException. | 
-**Message** | **string** | Detailed error message:   1.invalidQuery: The request did not contain one of the three required query parameters.   2.noDataFound: No data found for given parameters.   3.systemException: Exception occurs when calling the API. | 
+**Reason** | **string** | High level error message | 
+**Message** | **string** | Detailed error message. | 
 
 ## Methods
 
-### NewErrors
+### NewSubErrors
 
-`func NewErrors(reason string, message string, ) *Errors`
+`func NewSubErrors(reason string, message string, ) *SubErrors`
 
-NewErrors instantiates a new Errors object
+NewSubErrors instantiates a new SubErrors object
 This constructor will assign default values to properties that have it defined,
 and makes sure properties required by API are set, but the set of arguments
 will change when the set of required properties is changed
 
-### NewErrorsWithDefaults
+### NewSubErrorsWithDefaults
 
-`func NewErrorsWithDefaults() *Errors`
+`func NewSubErrorsWithDefaults() *SubErrors`
 
-NewErrorsWithDefaults instantiates a new Errors object
+NewSubErrorsWithDefaults instantiates a new SubErrors object
 This constructor will only assign default values to properties that have it defined,
 but it doesn't guarantee that properties required by API are set
 
 ### GetReason
 
-`func (o *Errors) GetReason() string`
+`func (o *SubErrors) GetReason() string`
 
 GetReason returns the Reason field if non-nil, zero value otherwise.
 
 ### GetReasonOk
 
-`func (o *Errors) GetReasonOk() (*string, bool)`
+`func (o *SubErrors) GetReasonOk() (*string, bool)`
 
 GetReasonOk returns a tuple with the Reason field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetReason
 
-`func (o *Errors) SetReason(v string)`
+`func (o *SubErrors) SetReason(v string)`
 
 SetReason sets Reason field to given value.
 
 
 ### GetMessage
 
-`func (o *Errors) GetMessage() string`
+`func (o *SubErrors) GetMessage() string`
 
 GetMessage returns the Message field if non-nil, zero value otherwise.
 
 ### GetMessageOk
 
-`func (o *Errors) GetMessageOk() (*string, bool)`
+`func (o *SubErrors) GetMessageOk() (*string, bool)`
 
 GetMessageOk returns a tuple with the Message field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetMessage
 
-`func (o *Errors) SetMessage(v string)`
+`func (o *SubErrors) SetMessage(v string)`
 
 SetMessage sets Message field to given value.
 

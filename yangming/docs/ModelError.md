@@ -6,16 +6,16 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **HttpMethod** | **string** | The HTTP request method type. | 
 **RequestUri** | **string** | The request URI. | 
-**Errors** | [**[]Errors**](Errors.md) |  | 
+**Errors** | [**[]SubErrors**](SubErrors.md) |  | 
 **StatusCode** | **int32** | The HTTP status code. | 
 **StatusCodeText** | **string** | The textual representation of the response status. | 
-**ErrorDateTime** | **string** | The date and time (in ISO 8601 format) the error occured. | 
+**ErrorDateTime** | **time.Time** | The date and time (in ISO 8601 format) the error occured. | 
 
 ## Methods
 
 ### NewModelError
 
-`func NewModelError(httpMethod string, requestUri string, errors []Errors, statusCode int32, statusCodeText string, errorDateTime string, ) *ModelError`
+`func NewModelError(httpMethod string, requestUri string, errors []SubErrors, statusCode int32, statusCodeText string, errorDateTime time.Time, ) *ModelError`
 
 NewModelError instantiates a new ModelError object
 This constructor will assign default values to properties that have it defined,
@@ -72,20 +72,20 @@ SetRequestUri sets RequestUri field to given value.
 
 ### GetErrors
 
-`func (o *ModelError) GetErrors() []Errors`
+`func (o *ModelError) GetErrors() []SubErrors`
 
 GetErrors returns the Errors field if non-nil, zero value otherwise.
 
 ### GetErrorsOk
 
-`func (o *ModelError) GetErrorsOk() (*[]Errors, bool)`
+`func (o *ModelError) GetErrorsOk() (*[]SubErrors, bool)`
 
 GetErrorsOk returns a tuple with the Errors field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetErrors
 
-`func (o *ModelError) SetErrors(v []Errors)`
+`func (o *ModelError) SetErrors(v []SubErrors)`
 
 SetErrors sets Errors field to given value.
 
@@ -132,20 +132,20 @@ SetStatusCodeText sets StatusCodeText field to given value.
 
 ### GetErrorDateTime
 
-`func (o *ModelError) GetErrorDateTime() string`
+`func (o *ModelError) GetErrorDateTime() time.Time`
 
 GetErrorDateTime returns the ErrorDateTime field if non-nil, zero value otherwise.
 
 ### GetErrorDateTimeOk
 
-`func (o *ModelError) GetErrorDateTimeOk() (*string, bool)`
+`func (o *ModelError) GetErrorDateTimeOk() (*time.Time, bool)`
 
 GetErrorDateTimeOk returns a tuple with the ErrorDateTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetErrorDateTime
 
-`func (o *ModelError) SetErrorDateTime(v string)`
+`func (o *ModelError) SetErrorDateTime(v time.Time)`
 
 SetErrorDateTime sets ErrorDateTime field to given value.
 

@@ -12,48 +12,56 @@ Contact: itcs@yangming.com
 package yangming
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
+// checks if the EquipmentEvent type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &EquipmentEvent{}
+
 // EquipmentEvent The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event.
 type EquipmentEvent struct {
-	// The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.
-	EventID string `json:"eventID"`
-	// The local date and time, where the event took place, in ISO 8601 format.
-	EventDateTime time.Time `json:"eventDateTime"`
-	// Code for the event classifier, either PLN, ACT or EST.
+	// The unique identifier for the event (the message - not the source).<br>NB: This field should be considered Metadata
+	EventID *string `json:"eventID,omitempty"`
+	// The timestamp of when the event was created.<br>NB: This field should be considered Metadata
+	EventCreatedDateTime time.Time `json:"eventCreatedDateTime"`
+	// The Event Type of the object - to be used as a discriminator. <br>NB: This field should be considered Metadata  Enum:  [ TRANSPORT ]
+	EventType string `json:"eventType"`
+	// Code for the event classifier can be    - ACT (Actual)   - PLN (Planned)   - EST (Estimated)  Enum:<br>[ ACT, PLN, EST ]
 	EventClassifierCode string `json:"eventClassifierCode"`
-	// Unique identifier for Event Type Code.
-	EventTypeCode string `json:"eventTypeCode"`
-	// The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. If a container is not yet assigned to a shipment, the interface cannot return any information when an equipment reference is given as input. If a container is assigned to an (active) shipment, the interface returns information on the active shipment.
-	EquipmentReference string `json:"equipmentReference"`
-	// The code to identify the specific type of facility.
-	FacilityTypeCode string `json:"facilityTypeCode"`
-	// The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.
-	UNLocationCode string `json:"UNLocationCode"`
-	// The code used for identifying the specific facility.
-	FacilityCode string `json:"facilityCode"`
-	// An alternative way to capture the facility when no standardized DCSA facility code can be found.
-	OtherFacility *string `json:"otherFacility,omitempty"`
-	// Code to denote whether the equipment is empty or laden.
-	EmptyIndicatorCode string `json:"emptyIndicatorCode"`
+	// The local date and time, where the event took place or when the event will take place, in ISO 8601 format.
+	EventDateTime time.Time `json:"eventDateTime"`
+	// Unique identifier for equipmentEventTypeCode.   - LOAD (Loaded)   - DISC (Discharged)   - GTIN (Gated in)   - GTOT (Gated out)   - STUF (Stuffed)   - STRP (Stripped)   - PICK (Pick-up)   - DROP (Drop-off)   - INSP (Inspected)   - RSEA (Resealed)   - RMVD (Removed)  More details can be found on GitHub <br><br>Enum:<br>[ LOAD, DISC, GTIN, GTOT, STUF, STRP, PICK, DROP, INSP, RSEA, RMVD ]
+	EquipmentEventTypeCode string `json:"equipmentEventTypeCode"`
+	// <small>maxLength: 15</small><br>The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
+	EquipmentReference *string `json:"equipmentReference,omitempty"`
+	// <small>maxLength: 4</small><br>Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.
+	ISOEquipmentCode *string `json:"ISOEquipmentCode,omitempty"`
+	// Code to denote whether the equipment is empty or laden.  Enum:  [ EMPTY, LADEN ]
+	EmptyIndicatorCode string               `json:"emptyIndicatorCode"`
+	EventLocation      *Location            `json:"eventLocation,omitempty"`
+	TransportCall      *TransportCall       `json:"transportCall,omitempty"`
+	DocumentReferences []DocumentReferences `json:"documentReferences,omitempty"`
+	References         []References         `json:"references,omitempty"`
+	// addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination. Only available when querying with Transport Document Reference.
+	Seals []Seal `json:"seals,omitempty"`
 }
+
+type _EquipmentEvent EquipmentEvent
 
 // NewEquipmentEvent instantiates a new EquipmentEvent object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEquipmentEvent(eventID string, eventDateTime time.Time, eventClassifierCode string, eventTypeCode string, equipmentReference string, facilityTypeCode string, uNLocationCode string, facilityCode string, emptyIndicatorCode string) *EquipmentEvent {
+func NewEquipmentEvent(eventCreatedDateTime time.Time, eventType string, eventClassifierCode string, eventDateTime time.Time, equipmentEventTypeCode string, emptyIndicatorCode string) *EquipmentEvent {
 	this := EquipmentEvent{}
-	this.EventID = eventID
-	this.EventDateTime = eventDateTime
+	this.EventCreatedDateTime = eventCreatedDateTime
+	this.EventType = eventType
 	this.EventClassifierCode = eventClassifierCode
-	this.EventTypeCode = eventTypeCode
-	this.EquipmentReference = equipmentReference
-	this.FacilityTypeCode = facilityTypeCode
-	this.UNLocationCode = uNLocationCode
-	this.FacilityCode = facilityCode
+	this.EventDateTime = eventDateTime
+	this.EquipmentEventTypeCode = equipmentEventTypeCode
 	this.EmptyIndicatorCode = emptyIndicatorCode
 	return &this
 }
@@ -66,52 +74,84 @@ func NewEquipmentEventWithDefaults() *EquipmentEvent {
 	return &this
 }
 
-// GetEventID returns the EventID field value
+// GetEventID returns the EventID field value if set, zero value otherwise.
 func (o *EquipmentEvent) GetEventID() string {
-	if o == nil {
+	if o == nil || IsNil(o.EventID) {
 		var ret string
 		return ret
 	}
-
-	return o.EventID
+	return *o.EventID
 }
 
-// GetEventIDOk returns a tuple with the EventID field value
+// GetEventIDOk returns a tuple with the EventID field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EquipmentEvent) GetEventIDOk() (*string, bool) {
-	if o == nil  {
+	if o == nil || IsNil(o.EventID) {
 		return nil, false
 	}
-	return &o.EventID, true
+	return o.EventID, true
 }
 
-// SetEventID sets field value
+// HasEventID returns a boolean if a field has been set.
+func (o *EquipmentEvent) HasEventID() bool {
+	if o != nil && !IsNil(o.EventID) {
+		return true
+	}
+
+	return false
+}
+
+// SetEventID gets a reference to the given string and assigns it to the EventID field.
 func (o *EquipmentEvent) SetEventID(v string) {
-	o.EventID = v
+	o.EventID = &v
 }
 
-// GetEventDateTime returns the EventDateTime field value
-func (o *EquipmentEvent) GetEventDateTime() time.Time {
+// GetEventCreatedDateTime returns the EventCreatedDateTime field value
+func (o *EquipmentEvent) GetEventCreatedDateTime() time.Time {
 	if o == nil {
 		var ret time.Time
 		return ret
 	}
 
-	return o.EventDateTime
+	return o.EventCreatedDateTime
 }
 
-// GetEventDateTimeOk returns a tuple with the EventDateTime field value
+// GetEventCreatedDateTimeOk returns a tuple with the EventCreatedDateTime field value
 // and a boolean to check if the value has been set.
-func (o *EquipmentEvent) GetEventDateTimeOk() (*time.Time, bool) {
-	if o == nil  {
+func (o *EquipmentEvent) GetEventCreatedDateTimeOk() (*time.Time, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return &o.EventDateTime, true
+	return &o.EventCreatedDateTime, true
 }
 
-// SetEventDateTime sets field value
-func (o *EquipmentEvent) SetEventDateTime(v time.Time) {
-	o.EventDateTime = v
+// SetEventCreatedDateTime sets field value
+func (o *EquipmentEvent) SetEventCreatedDateTime(v time.Time) {
+	o.EventCreatedDateTime = v
+}
+
+// GetEventType returns the EventType field value
+func (o *EquipmentEvent) GetEventType() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.EventType
+}
+
+// GetEventTypeOk returns a tuple with the EventType field value
+// and a boolean to check if the value has been set.
+func (o *EquipmentEvent) GetEventTypeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.EventType, true
+}
+
+// SetEventType sets field value
+func (o *EquipmentEvent) SetEventType(v string) {
+	o.EventType = v
 }
 
 // GetEventClassifierCode returns the EventClassifierCode field value
@@ -127,7 +167,7 @@ func (o *EquipmentEvent) GetEventClassifierCode() string {
 // GetEventClassifierCodeOk returns a tuple with the EventClassifierCode field value
 // and a boolean to check if the value has been set.
 func (o *EquipmentEvent) GetEventClassifierCodeOk() (*string, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return &o.EventClassifierCode, true
@@ -138,156 +178,116 @@ func (o *EquipmentEvent) SetEventClassifierCode(v string) {
 	o.EventClassifierCode = v
 }
 
-// GetEventTypeCode returns the EventTypeCode field value
-func (o *EquipmentEvent) GetEventTypeCode() string {
+// GetEventDateTime returns the EventDateTime field value
+func (o *EquipmentEvent) GetEventDateTime() time.Time {
 	if o == nil {
-		var ret string
+		var ret time.Time
 		return ret
 	}
 
-	return o.EventTypeCode
+	return o.EventDateTime
 }
 
-// GetEventTypeCodeOk returns a tuple with the EventTypeCode field value
+// GetEventDateTimeOk returns a tuple with the EventDateTime field value
 // and a boolean to check if the value has been set.
-func (o *EquipmentEvent) GetEventTypeCodeOk() (*string, bool) {
-	if o == nil  {
+func (o *EquipmentEvent) GetEventDateTimeOk() (*time.Time, bool) {
+	if o == nil {
 		return nil, false
 	}
-	return &o.EventTypeCode, true
+	return &o.EventDateTime, true
 }
 
-// SetEventTypeCode sets field value
-func (o *EquipmentEvent) SetEventTypeCode(v string) {
-	o.EventTypeCode = v
+// SetEventDateTime sets field value
+func (o *EquipmentEvent) SetEventDateTime(v time.Time) {
+	o.EventDateTime = v
 }
 
-// GetEquipmentReference returns the EquipmentReference field value
-func (o *EquipmentEvent) GetEquipmentReference() string {
+// GetEquipmentEventTypeCode returns the EquipmentEventTypeCode field value
+func (o *EquipmentEvent) GetEquipmentEventTypeCode() string {
 	if o == nil {
 		var ret string
 		return ret
 	}
 
-	return o.EquipmentReference
+	return o.EquipmentEventTypeCode
 }
 
-// GetEquipmentReferenceOk returns a tuple with the EquipmentReference field value
+// GetEquipmentEventTypeCodeOk returns a tuple with the EquipmentEventTypeCode field value
+// and a boolean to check if the value has been set.
+func (o *EquipmentEvent) GetEquipmentEventTypeCodeOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.EquipmentEventTypeCode, true
+}
+
+// SetEquipmentEventTypeCode sets field value
+func (o *EquipmentEvent) SetEquipmentEventTypeCode(v string) {
+	o.EquipmentEventTypeCode = v
+}
+
+// GetEquipmentReference returns the EquipmentReference field value if set, zero value otherwise.
+func (o *EquipmentEvent) GetEquipmentReference() string {
+	if o == nil || IsNil(o.EquipmentReference) {
+		var ret string
+		return ret
+	}
+	return *o.EquipmentReference
+}
+
+// GetEquipmentReferenceOk returns a tuple with the EquipmentReference field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *EquipmentEvent) GetEquipmentReferenceOk() (*string, bool) {
-	if o == nil  {
+	if o == nil || IsNil(o.EquipmentReference) {
 		return nil, false
 	}
-	return &o.EquipmentReference, true
+	return o.EquipmentReference, true
 }
 
-// SetEquipmentReference sets field value
-func (o *EquipmentEvent) SetEquipmentReference(v string) {
-	o.EquipmentReference = v
-}
-
-// GetFacilityTypeCode returns the FacilityTypeCode field value
-func (o *EquipmentEvent) GetFacilityTypeCode() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.FacilityTypeCode
-}
-
-// GetFacilityTypeCodeOk returns a tuple with the FacilityTypeCode field value
-// and a boolean to check if the value has been set.
-func (o *EquipmentEvent) GetFacilityTypeCodeOk() (*string, bool) {
-	if o == nil  {
-		return nil, false
-	}
-	return &o.FacilityTypeCode, true
-}
-
-// SetFacilityTypeCode sets field value
-func (o *EquipmentEvent) SetFacilityTypeCode(v string) {
-	o.FacilityTypeCode = v
-}
-
-// GetUNLocationCode returns the UNLocationCode field value
-func (o *EquipmentEvent) GetUNLocationCode() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.UNLocationCode
-}
-
-// GetUNLocationCodeOk returns a tuple with the UNLocationCode field value
-// and a boolean to check if the value has been set.
-func (o *EquipmentEvent) GetUNLocationCodeOk() (*string, bool) {
-	if o == nil  {
-		return nil, false
-	}
-	return &o.UNLocationCode, true
-}
-
-// SetUNLocationCode sets field value
-func (o *EquipmentEvent) SetUNLocationCode(v string) {
-	o.UNLocationCode = v
-}
-
-// GetFacilityCode returns the FacilityCode field value
-func (o *EquipmentEvent) GetFacilityCode() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.FacilityCode
-}
-
-// GetFacilityCodeOk returns a tuple with the FacilityCode field value
-// and a boolean to check if the value has been set.
-func (o *EquipmentEvent) GetFacilityCodeOk() (*string, bool) {
-	if o == nil  {
-		return nil, false
-	}
-	return &o.FacilityCode, true
-}
-
-// SetFacilityCode sets field value
-func (o *EquipmentEvent) SetFacilityCode(v string) {
-	o.FacilityCode = v
-}
-
-// GetOtherFacility returns the OtherFacility field value if set, zero value otherwise.
-func (o *EquipmentEvent) GetOtherFacility() string {
-	if o == nil || o.OtherFacility == nil {
-		var ret string
-		return ret
-	}
-	return *o.OtherFacility
-}
-
-// GetOtherFacilityOk returns a tuple with the OtherFacility field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *EquipmentEvent) GetOtherFacilityOk() (*string, bool) {
-	if o == nil || o.OtherFacility == nil {
-		return nil, false
-	}
-	return o.OtherFacility, true
-}
-
-// HasOtherFacility returns a boolean if a field has been set.
-func (o *EquipmentEvent) HasOtherFacility() bool {
-	if o != nil && o.OtherFacility != nil {
+// HasEquipmentReference returns a boolean if a field has been set.
+func (o *EquipmentEvent) HasEquipmentReference() bool {
+	if o != nil && !IsNil(o.EquipmentReference) {
 		return true
 	}
 
 	return false
 }
 
-// SetOtherFacility gets a reference to the given string and assigns it to the OtherFacility field.
-func (o *EquipmentEvent) SetOtherFacility(v string) {
-	o.OtherFacility = &v
+// SetEquipmentReference gets a reference to the given string and assigns it to the EquipmentReference field.
+func (o *EquipmentEvent) SetEquipmentReference(v string) {
+	o.EquipmentReference = &v
+}
+
+// GetISOEquipmentCode returns the ISOEquipmentCode field value if set, zero value otherwise.
+func (o *EquipmentEvent) GetISOEquipmentCode() string {
+	if o == nil || IsNil(o.ISOEquipmentCode) {
+		var ret string
+		return ret
+	}
+	return *o.ISOEquipmentCode
+}
+
+// GetISOEquipmentCodeOk returns a tuple with the ISOEquipmentCode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EquipmentEvent) GetISOEquipmentCodeOk() (*string, bool) {
+	if o == nil || IsNil(o.ISOEquipmentCode) {
+		return nil, false
+	}
+	return o.ISOEquipmentCode, true
+}
+
+// HasISOEquipmentCode returns a boolean if a field has been set.
+func (o *EquipmentEvent) HasISOEquipmentCode() bool {
+	if o != nil && !IsNil(o.ISOEquipmentCode) {
+		return true
+	}
+
+	return false
+}
+
+// SetISOEquipmentCode gets a reference to the given string and assigns it to the ISOEquipmentCode field.
+func (o *EquipmentEvent) SetISOEquipmentCode(v string) {
+	o.ISOEquipmentCode = &v
 }
 
 // GetEmptyIndicatorCode returns the EmptyIndicatorCode field value
@@ -303,7 +303,7 @@ func (o *EquipmentEvent) GetEmptyIndicatorCode() string {
 // GetEmptyIndicatorCodeOk returns a tuple with the EmptyIndicatorCode field value
 // and a boolean to check if the value has been set.
 func (o *EquipmentEvent) GetEmptyIndicatorCodeOk() (*string, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return &o.EmptyIndicatorCode, true
@@ -314,39 +314,249 @@ func (o *EquipmentEvent) SetEmptyIndicatorCode(v string) {
 	o.EmptyIndicatorCode = v
 }
 
+// GetEventLocation returns the EventLocation field value if set, zero value otherwise.
+func (o *EquipmentEvent) GetEventLocation() Location {
+	if o == nil || IsNil(o.EventLocation) {
+		var ret Location
+		return ret
+	}
+	return *o.EventLocation
+}
+
+// GetEventLocationOk returns a tuple with the EventLocation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EquipmentEvent) GetEventLocationOk() (*Location, bool) {
+	if o == nil || IsNil(o.EventLocation) {
+		return nil, false
+	}
+	return o.EventLocation, true
+}
+
+// HasEventLocation returns a boolean if a field has been set.
+func (o *EquipmentEvent) HasEventLocation() bool {
+	if o != nil && !IsNil(o.EventLocation) {
+		return true
+	}
+
+	return false
+}
+
+// SetEventLocation gets a reference to the given Location and assigns it to the EventLocation field.
+func (o *EquipmentEvent) SetEventLocation(v Location) {
+	o.EventLocation = &v
+}
+
+// GetTransportCall returns the TransportCall field value if set, zero value otherwise.
+func (o *EquipmentEvent) GetTransportCall() TransportCall {
+	if o == nil || IsNil(o.TransportCall) {
+		var ret TransportCall
+		return ret
+	}
+	return *o.TransportCall
+}
+
+// GetTransportCallOk returns a tuple with the TransportCall field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EquipmentEvent) GetTransportCallOk() (*TransportCall, bool) {
+	if o == nil || IsNil(o.TransportCall) {
+		return nil, false
+	}
+	return o.TransportCall, true
+}
+
+// HasTransportCall returns a boolean if a field has been set.
+func (o *EquipmentEvent) HasTransportCall() bool {
+	if o != nil && !IsNil(o.TransportCall) {
+		return true
+	}
+
+	return false
+}
+
+// SetTransportCall gets a reference to the given TransportCall and assigns it to the TransportCall field.
+func (o *EquipmentEvent) SetTransportCall(v TransportCall) {
+	o.TransportCall = &v
+}
+
+// GetDocumentReferences returns the DocumentReferences field value if set, zero value otherwise.
+func (o *EquipmentEvent) GetDocumentReferences() []DocumentReferences {
+	if o == nil || IsNil(o.DocumentReferences) {
+		var ret []DocumentReferences
+		return ret
+	}
+	return o.DocumentReferences
+}
+
+// GetDocumentReferencesOk returns a tuple with the DocumentReferences field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EquipmentEvent) GetDocumentReferencesOk() ([]DocumentReferences, bool) {
+	if o == nil || IsNil(o.DocumentReferences) {
+		return nil, false
+	}
+	return o.DocumentReferences, true
+}
+
+// HasDocumentReferences returns a boolean if a field has been set.
+func (o *EquipmentEvent) HasDocumentReferences() bool {
+	if o != nil && !IsNil(o.DocumentReferences) {
+		return true
+	}
+
+	return false
+}
+
+// SetDocumentReferences gets a reference to the given []DocumentReferences and assigns it to the DocumentReferences field.
+func (o *EquipmentEvent) SetDocumentReferences(v []DocumentReferences) {
+	o.DocumentReferences = v
+}
+
+// GetReferences returns the References field value if set, zero value otherwise.
+func (o *EquipmentEvent) GetReferences() []References {
+	if o == nil || IsNil(o.References) {
+		var ret []References
+		return ret
+	}
+	return o.References
+}
+
+// GetReferencesOk returns a tuple with the References field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EquipmentEvent) GetReferencesOk() ([]References, bool) {
+	if o == nil || IsNil(o.References) {
+		return nil, false
+	}
+	return o.References, true
+}
+
+// HasReferences returns a boolean if a field has been set.
+func (o *EquipmentEvent) HasReferences() bool {
+	if o != nil && !IsNil(o.References) {
+		return true
+	}
+
+	return false
+}
+
+// SetReferences gets a reference to the given []References and assigns it to the References field.
+func (o *EquipmentEvent) SetReferences(v []References) {
+	o.References = v
+}
+
+// GetSeals returns the Seals field value if set, zero value otherwise.
+func (o *EquipmentEvent) GetSeals() []Seal {
+	if o == nil || IsNil(o.Seals) {
+		var ret []Seal
+		return ret
+	}
+	return o.Seals
+}
+
+// GetSealsOk returns a tuple with the Seals field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *EquipmentEvent) GetSealsOk() ([]Seal, bool) {
+	if o == nil || IsNil(o.Seals) {
+		return nil, false
+	}
+	return o.Seals, true
+}
+
+// HasSeals returns a boolean if a field has been set.
+func (o *EquipmentEvent) HasSeals() bool {
+	if o != nil && !IsNil(o.Seals) {
+		return true
+	}
+
+	return false
+}
+
+// SetSeals gets a reference to the given []Seal and assigns it to the Seals field.
+func (o *EquipmentEvent) SetSeals(v []Seal) {
+	o.Seals = v
+}
+
 func (o EquipmentEvent) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["eventID"] = o.EventID
-	}
-	if true {
-		toSerialize["eventDateTime"] = o.EventDateTime
-	}
-	if true {
-		toSerialize["eventClassifierCode"] = o.EventClassifierCode
-	}
-	if true {
-		toSerialize["eventTypeCode"] = o.EventTypeCode
-	}
-	if true {
-		toSerialize["equipmentReference"] = o.EquipmentReference
-	}
-	if true {
-		toSerialize["facilityTypeCode"] = o.FacilityTypeCode
-	}
-	if true {
-		toSerialize["UNLocationCode"] = o.UNLocationCode
-	}
-	if true {
-		toSerialize["facilityCode"] = o.FacilityCode
-	}
-	if o.OtherFacility != nil {
-		toSerialize["otherFacility"] = o.OtherFacility
-	}
-	if true {
-		toSerialize["emptyIndicatorCode"] = o.EmptyIndicatorCode
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o EquipmentEvent) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	if !IsNil(o.EventID) {
+		toSerialize["eventID"] = o.EventID
+	}
+	toSerialize["eventCreatedDateTime"] = o.EventCreatedDateTime
+	toSerialize["eventType"] = o.EventType
+	toSerialize["eventClassifierCode"] = o.EventClassifierCode
+	toSerialize["eventDateTime"] = o.EventDateTime
+	toSerialize["equipmentEventTypeCode"] = o.EquipmentEventTypeCode
+	if !IsNil(o.EquipmentReference) {
+		toSerialize["equipmentReference"] = o.EquipmentReference
+	}
+	if !IsNil(o.ISOEquipmentCode) {
+		toSerialize["ISOEquipmentCode"] = o.ISOEquipmentCode
+	}
+	toSerialize["emptyIndicatorCode"] = o.EmptyIndicatorCode
+	if !IsNil(o.EventLocation) {
+		toSerialize["eventLocation"] = o.EventLocation
+	}
+	if !IsNil(o.TransportCall) {
+		toSerialize["transportCall"] = o.TransportCall
+	}
+	if !IsNil(o.DocumentReferences) {
+		toSerialize["documentReferences"] = o.DocumentReferences
+	}
+	if !IsNil(o.References) {
+		toSerialize["references"] = o.References
+	}
+	if !IsNil(o.Seals) {
+		toSerialize["seals"] = o.Seals
+	}
+	return toSerialize, nil
+}
+
+func (o *EquipmentEvent) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"eventCreatedDateTime",
+		"eventType",
+		"eventClassifierCode",
+		"eventDateTime",
+		"equipmentEventTypeCode",
+		"emptyIndicatorCode",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varEquipmentEvent := _EquipmentEvent{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varEquipmentEvent)
+
+	if err != nil {
+		return err
+	}
+
+	*o = EquipmentEvent(varEquipmentEvent)
+
+	return err
 }
 
 type NullableEquipmentEvent struct {
@@ -384,5 +594,3 @@ func (v *NullableEquipmentEvent) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

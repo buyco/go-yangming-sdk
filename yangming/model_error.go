@@ -12,29 +12,37 @@ Contact: itcs@yangming.com
 package yangming
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"time"
 )
+
+// checks if the ModelError type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &ModelError{}
 
 // ModelError struct for ModelError
 type ModelError struct {
 	// The HTTP request method type.
 	HttpMethod string `json:"httpMethod"`
 	// The request URI.
-	RequestUri string `json:"requestUri"`
-	Errors []Errors `json:"errors"`
+	RequestUri string      `json:"requestUri"`
+	Errors     []SubErrors `json:"errors"`
 	// The HTTP status code.
 	StatusCode int32 `json:"statusCode"`
 	// The textual representation of the response status.
 	StatusCodeText string `json:"statusCodeText"`
 	// The date and time (in ISO 8601 format) the error occured.
-	ErrorDateTime string `json:"errorDateTime"`
+	ErrorDateTime time.Time `json:"errorDateTime"`
 }
+
+type _ModelError ModelError
 
 // NewModelError instantiates a new ModelError object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewModelError(httpMethod string, requestUri string, errors []Errors, statusCode int32, statusCodeText string, errorDateTime string) *ModelError {
+func NewModelError(httpMethod string, requestUri string, errors []SubErrors, statusCode int32, statusCodeText string, errorDateTime time.Time) *ModelError {
 	this := ModelError{}
 	this.HttpMethod = httpMethod
 	this.RequestUri = requestUri
@@ -66,7 +74,7 @@ func (o *ModelError) GetHttpMethod() string {
 // GetHttpMethodOk returns a tuple with the HttpMethod field value
 // and a boolean to check if the value has been set.
 func (o *ModelError) GetHttpMethodOk() (*string, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return &o.HttpMethod, true
@@ -90,7 +98,7 @@ func (o *ModelError) GetRequestUri() string {
 // GetRequestUriOk returns a tuple with the RequestUri field value
 // and a boolean to check if the value has been set.
 func (o *ModelError) GetRequestUriOk() (*string, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return &o.RequestUri, true
@@ -102,9 +110,9 @@ func (o *ModelError) SetRequestUri(v string) {
 }
 
 // GetErrors returns the Errors field value
-func (o *ModelError) GetErrors() []Errors {
+func (o *ModelError) GetErrors() []SubErrors {
 	if o == nil {
-		var ret []Errors
+		var ret []SubErrors
 		return ret
 	}
 
@@ -113,15 +121,15 @@ func (o *ModelError) GetErrors() []Errors {
 
 // GetErrorsOk returns a tuple with the Errors field value
 // and a boolean to check if the value has been set.
-func (o *ModelError) GetErrorsOk() ([]Errors, bool) {
-	if o == nil  {
+func (o *ModelError) GetErrorsOk() ([]SubErrors, bool) {
+	if o == nil {
 		return nil, false
 	}
 	return o.Errors, true
 }
 
 // SetErrors sets field value
-func (o *ModelError) SetErrors(v []Errors) {
+func (o *ModelError) SetErrors(v []SubErrors) {
 	o.Errors = v
 }
 
@@ -138,7 +146,7 @@ func (o *ModelError) GetStatusCode() int32 {
 // GetStatusCodeOk returns a tuple with the StatusCode field value
 // and a boolean to check if the value has been set.
 func (o *ModelError) GetStatusCodeOk() (*int32, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return &o.StatusCode, true
@@ -162,7 +170,7 @@ func (o *ModelError) GetStatusCodeText() string {
 // GetStatusCodeTextOk returns a tuple with the StatusCodeText field value
 // and a boolean to check if the value has been set.
 func (o *ModelError) GetStatusCodeTextOk() (*string, bool) {
-	if o == nil  {
+	if o == nil {
 		return nil, false
 	}
 	return &o.StatusCodeText, true
@@ -174,9 +182,9 @@ func (o *ModelError) SetStatusCodeText(v string) {
 }
 
 // GetErrorDateTime returns the ErrorDateTime field value
-func (o *ModelError) GetErrorDateTime() string {
+func (o *ModelError) GetErrorDateTime() time.Time {
 	if o == nil {
-		var ret string
+		var ret time.Time
 		return ret
 	}
 
@@ -185,39 +193,77 @@ func (o *ModelError) GetErrorDateTime() string {
 
 // GetErrorDateTimeOk returns a tuple with the ErrorDateTime field value
 // and a boolean to check if the value has been set.
-func (o *ModelError) GetErrorDateTimeOk() (*string, bool) {
-	if o == nil  {
+func (o *ModelError) GetErrorDateTimeOk() (*time.Time, bool) {
+	if o == nil {
 		return nil, false
 	}
 	return &o.ErrorDateTime, true
 }
 
 // SetErrorDateTime sets field value
-func (o *ModelError) SetErrorDateTime(v string) {
+func (o *ModelError) SetErrorDateTime(v time.Time) {
 	o.ErrorDateTime = v
 }
 
 func (o ModelError) MarshalJSON() ([]byte, error) {
-	toSerialize := map[string]interface{}{}
-	if true {
-		toSerialize["httpMethod"] = o.HttpMethod
-	}
-	if true {
-		toSerialize["requestUri"] = o.RequestUri
-	}
-	if true {
-		toSerialize["errors"] = o.Errors
-	}
-	if true {
-		toSerialize["statusCode"] = o.StatusCode
-	}
-	if true {
-		toSerialize["statusCodeText"] = o.StatusCodeText
-	}
-	if true {
-		toSerialize["errorDateTime"] = o.ErrorDateTime
+	toSerialize, err := o.ToMap()
+	if err != nil {
+		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
+}
+
+func (o ModelError) ToMap() (map[string]interface{}, error) {
+	toSerialize := map[string]interface{}{}
+	toSerialize["httpMethod"] = o.HttpMethod
+	toSerialize["requestUri"] = o.RequestUri
+	toSerialize["errors"] = o.Errors
+	toSerialize["statusCode"] = o.StatusCode
+	toSerialize["statusCodeText"] = o.StatusCodeText
+	toSerialize["errorDateTime"] = o.ErrorDateTime
+	return toSerialize, nil
+}
+
+func (o *ModelError) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"httpMethod",
+		"requestUri",
+		"errors",
+		"statusCode",
+		"statusCodeText",
+		"errorDateTime",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err
+	}
+
+	for _, requiredProperty := range requiredProperties {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varModelError := _ModelError{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varModelError)
+
+	if err != nil {
+		return err
+	}
+
+	*o = ModelError(varModelError)
+
+	return err
 }
 
 type NullableModelError struct {
@@ -255,5 +301,3 @@ func (v *NullableModelError) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

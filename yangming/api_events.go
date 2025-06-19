@@ -14,113 +14,230 @@ package yangming
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
+	"reflect"
 )
 
-// Linger please
-var (
-	_ context.Context
-)
-
-type EventsApi interface {
+type EventsAPI interface {
 
 	/*
-	V110GGetEvents Find events by Booking Reference, Bill of Lading or Equipment Reference.
+			V220GetEvents Find events.
 
-	Returns all events related to the query parameter. The endpoint requires at least 1 of the 3 query parameters to be used.
+			Returns all events filtered by the queryParameters. The endpoint requires at least 1 of the 3 query parameters. (Carrier Booking Reference, Equipment Reference, Transport Document Reference)
 
-	 @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	 @return ApiV110GGetEventsRequest
+		**NB**: It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting.
+
+		Example: *shipmentEventTypeCode=DRFT and equipmentEventTypeCode=GTIN*
+
+		Since there is no event that can be a ShipmentEvent and an EquipmentEvent at the same time **this will return an empty list!**
+
+
+			@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+			@return ApiV220GetEventsRequest
 	*/
-	V110GGetEvents(ctx context.Context) ApiV110GGetEventsRequest
+	V220GetEvents(ctx context.Context) ApiV220GetEventsRequest
 
-	// V110GGetEventsExecute executes the request
+	// V220GetEventsExecute executes the request
 	//  @return Events
-	V110GGetEventsExecute(r ApiV110GGetEventsRequest) (*Events, *http.Response, error)
+	V220GetEventsExecute(r ApiV220GetEventsRequest) (*Events, *http.Response, error)
 }
 
-// EventsApiService EventsApi service
-type EventsApiService service
+// EventsAPIService EventsAPI service
+type EventsAPIService service
 
-type ApiV110GGetEventsRequest struct {
-	ctx context.Context
-	ApiService EventsApi
-	keyId *string
-	bookingReference *string
-	billOfLadingNumber *string
-	equipmentReference *string
+type ApiV220GetEventsRequest struct {
+	ctx                        context.Context
+	ApiService                 EventsAPI
+	keyId                      *string
+	carrierBookingReference    *string
+	transportDocumentReference *string
+	equipmentReference         *string
+	transportEventTypeCode     *[]string
+	vesselIMONumber            *string
+	transportCallID            *string
+	exportVoyageNumber         *string
+	equipmentEventTypeCode     *[]string
+	carrierServiceCode         *string
+	eventType                  *[]string
+	uNLocationCode             *string
 }
 
-func (r ApiV110GGetEventsRequest) KeyId(keyId string) ApiV110GGetEventsRequest {
+func (r ApiV220GetEventsRequest) KeyId(keyId string) ApiV220GetEventsRequest {
 	r.keyId = &keyId
 	return r
 }
-// The identifier for a shipment, which is issued by and unique within each of the carriers.
-func (r ApiV110GGetEventsRequest) BookingReference(bookingReference string) ApiV110GGetEventsRequest {
-	r.bookingReference = &bookingReference
+
+// A set of unique characters provided by carrier to identify a booking.&lt;br&gt;Specifying this filter will only return events related to this particular carrierBookingReference.&lt;br&gt;&lt;small&gt;*maxLength: 35*&lt;/small&gt;
+func (r ApiV220GetEventsRequest) CarrierBookingReference(carrierBookingReference string) ApiV220GetEventsRequest {
+	r.carrierBookingReference = &carrierBookingReference
 	return r
 }
-// Bill of lading number is an identifier that links to a shipment. Bill of Lading is the legal document issued to the customer, which confirms the carrier&#39;s receipt of the cargo from the customer acknowledging goods being shipped and specifying the terms of delivery.
-func (r ApiV110GGetEventsRequest) BillOfLadingNumber(billOfLadingNumber string) ApiV110GGetEventsRequest {
-	r.billOfLadingNumber = &billOfLadingNumber
+
+// A unique number reference allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.&lt;br&gt;Specifying this filter will only return events related to this particular transportDocumentReference &lt;br&gt;&lt;small&gt;*maxLength: 20*&lt;/small&gt;
+func (r ApiV220GetEventsRequest) TransportDocumentReference(transportDocumentReference string) ApiV220GetEventsRequest {
+	r.transportDocumentReference = &transportDocumentReference
 	return r
 }
-// The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.
-func (r ApiV110GGetEventsRequest) EquipmentReference(equipmentReference string) ApiV110GGetEventsRequest {
+
+// Will filter by the unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.&lt;br&gt;Specifying this filter will only return events related to this particular equipmentReference&lt;br&gt;&lt;small&gt;*maxLength: 15*&lt;/small&gt;
+func (r ApiV220GetEventsRequest) EquipmentReference(equipmentReference string) ApiV220GetEventsRequest {
 	r.equipmentReference = &equipmentReference
 	return r
 }
 
-func (r ApiV110GGetEventsRequest) Execute() (*Events, *http.Response, error) {
-	return r.ApiService.V110GGetEventsExecute(r)
+// Identifier for type of Transport event to filter by   - ARRI (Arrived)   - DEPA (Departed)  It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example *transportEventTypeCode&#x3D;ARRI,DEPA* matches **both** Arrived (ARRI) and Departed (DEPA) transport events.&lt;br&gt;Default is all transportEventTypeCodes.&lt;br&gt;This filter is only relevant when filtering on TransportEvents&lt;br&gt;*Available values* : ARRI, DEPA&lt;br&gt;*Default value* : ARRI,DEPA&lt;br&gt;*Example* : List [\&quot;ARRI\&quot;,\&quot;DEPA\&quot;]
+func (r ApiV220GetEventsRequest) TransportEventTypeCode(transportEventTypeCode []string) ApiV220GetEventsRequest {
+	r.transportEventTypeCode = &transportEventTypeCode
+	return r
+}
+
+// The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.&lt;br&gt;Specifying this filter will only return events related to this particular vesselIMONumber. &lt;br&gt;&lt;small&gt;*maxLength: 7*&lt;/small&gt;
+func (r ApiV220GetEventsRequest) VesselIMONumber(vesselIMONumber string) ApiV220GetEventsRequest {
+	r.vesselIMONumber = &vesselIMONumber
+	return r
+}
+
+// ID uniquely identifying a transport call, to filter events by.&lt;br&gt;Specifying this filter will only return events related to this particular transportCallID &lt;br&gt;&lt;small&gt;*maxLength: 100*&lt;/small&gt;
+func (r ApiV220GetEventsRequest) TransportCallID(transportCallID string) ApiV220GetEventsRequest {
+	r.transportCallID = &transportCallID
+	return r
+}
+
+// Filter on the vessel operator-specific identifier of the export Voyage.&lt;br&gt;Specifying this filter will only return events related to this particular exportVoyageNumber. &lt;br&gt;&lt;small&gt;*maxLength: 50*&lt;/small&gt;
+func (r ApiV220GetEventsRequest) ExportVoyageNumber(exportVoyageNumber string) ApiV220GetEventsRequest {
+	r.exportVoyageNumber = &exportVoyageNumber
+	return r
+}
+
+// Unique identifier for equipmentEventTypeCode.   - LOAD (Loaded)   - DISC (Discharged)   - GTIN (Gated in)   - GTOT (Gated out)   - STUF (Stuffed)   - STRP (Stripped)   - PICK (Pick-up)   - DROP (Drop-off)   - INSP (Inspected)   - RSEA (Resealed)   - RMVD (Removed)  It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example *equipmentEventTypeCode&#x3D;GTIN,GTOT* matches **both** Gated in (GTIN) and Gated out (GTOT) equipment events.&lt;br&gt;Default is all equipmentEventTypeCodes.&lt;br&gt;This filter is only relevant when filtering on EquipmentEvents&lt;br&gt;*Available values* : LOAD, DISC, GTIN, GTOT, STUF, STRP, PICK, DROP, INSP, RSEA, RMVD&lt;br&gt;*Default value* : LOAD,DISC,GTIN,GTOT,STUF,STRP,PICK,DROP,INSP,RSEA,RMVD&lt;br&gt;*Example* : List [\&quot;GTOT\&quot;,\&quot;GTIN\&quot;]
+func (r ApiV220GetEventsRequest) EquipmentEventTypeCode(equipmentEventTypeCode []string) ApiV220GetEventsRequest {
+	r.equipmentEventTypeCode = &equipmentEventTypeCode
+	return r
+}
+
+// Filter on the carrier specific identifier of the service.&lt;br&gt;Specifying this filter will only return events related to this particular carrierServiceCode.&lt;br&gt;&lt;small&gt;*maxLength: 5*&lt;/small&gt;
+func (r ApiV220GetEventsRequest) CarrierServiceCode(carrierServiceCode string) ApiV220GetEventsRequest {
+	r.carrierServiceCode = &carrierServiceCode
+	return r
+}
+
+// The type of event(s) to filter by. Possible values are   - TRANSPORT (Transport events)   - EQUIPMENT (Equipment events)  It is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example eventType&#x3D;TRANSPORT,EQUIPMENT matches both Transport and Equipment events.&lt;br&gt;Default value is all event types.&lt;br&gt;*Available values* : TRANSPORT, EQUIPMENT&lt;br&gt;*Example* : List [\&quot;TRANSPORT\&quot;,\&quot;EQUIPMENT\&quot;]
+func (r ApiV220GetEventsRequest) EventType(eventType []string) ApiV220GetEventsRequest {
+	r.eventType = &eventType
+	return r
+}
+
+// The UN Location code specifying where the place is located.&lt;br&gt;Specifying this filter will only return events related to this particular UN Location code.&lt;br&gt;&lt;small&gt;*maxLength: 5*&lt;/small&gt;
+func (r ApiV220GetEventsRequest) UNLocationCode(uNLocationCode string) ApiV220GetEventsRequest {
+	r.uNLocationCode = &uNLocationCode
+	return r
+}
+
+func (r ApiV220GetEventsRequest) Execute() (*Events, *http.Response, error) {
+	return r.ApiService.V220GetEventsExecute(r)
 }
 
 /*
-V110GGetEvents Find events by Booking Reference, Bill of Lading or Equipment Reference.
+V220GetEvents Find events.
 
-Returns all events related to the query parameter. The endpoint requires at least 1 of the 3 query parameters to be used.
+Returns all events filtered by the queryParameters. The endpoint requires at least 1 of the 3 query parameters. (Carrier Booking Reference, Equipment Reference, Transport Document Reference)
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiV110GGetEventsRequest
+**NB**: It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting.
+
+Example: *shipmentEventTypeCode=DRFT and equipmentEventTypeCode=GTIN*
+
+Since there is no event that can be a ShipmentEvent and an EquipmentEvent at the same time **this will return an empty list!**
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiV220GetEventsRequest
 */
-func (a *EventsApiService) V110GGetEvents(ctx context.Context) ApiV110GGetEventsRequest {
-	return ApiV110GGetEventsRequest{
+func (a *EventsAPIService) V220GetEvents(ctx context.Context) ApiV220GetEventsRequest {
+	return ApiV220GetEventsRequest{
 		ApiService: a,
-		ctx: ctx,
+		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
-//  @return Events
-func (a *EventsApiService) V110GGetEventsExecute(r ApiV110GGetEventsRequest) (*Events, *http.Response, error) {
+//
+//	@return Events
+func (a *EventsAPIService) V220GetEventsExecute(r ApiV220GetEventsRequest) (*Events, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Events
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Events
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "EventsApiService.V110GGetEvents")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "EventsAPIService.V220GetEvents")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/1.1.0/events"
+	localVarPath := localBasePath + "/v2/events"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
-	if r.bookingReference != nil {
-		localVarQueryParams.Add("bookingReference", parameterToString(*r.bookingReference, ""))
+	if r.carrierBookingReference != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "carrierBookingReference", r.carrierBookingReference, "form", "")
 	}
-	if r.billOfLadingNumber != nil {
-		localVarQueryParams.Add("billOfLadingNumber", parameterToString(*r.billOfLadingNumber, ""))
+	if r.transportDocumentReference != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "transportDocumentReference", r.transportDocumentReference, "form", "")
 	}
 	if r.equipmentReference != nil {
-		localVarQueryParams.Add("equipmentReference", parameterToString(*r.equipmentReference, ""))
+		parameterAddToHeaderOrQuery(localVarQueryParams, "equipmentReference", r.equipmentReference, "form", "")
+	}
+	if r.transportEventTypeCode != nil {
+		t := *r.transportEventTypeCode
+		if reflect.TypeOf(t).Kind() == reflect.Slice {
+			s := reflect.ValueOf(t)
+			for i := 0; i < s.Len(); i++ {
+				parameterAddToHeaderOrQuery(localVarQueryParams, "transportEventTypeCode", s.Index(i).Interface(), "form", "multi")
+			}
+		} else {
+			parameterAddToHeaderOrQuery(localVarQueryParams, "transportEventTypeCode", t, "form", "multi")
+		}
+	}
+	if r.vesselIMONumber != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "vesselIMONumber", r.vesselIMONumber, "form", "")
+	}
+	if r.transportCallID != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "transportCallID", r.transportCallID, "form", "")
+	}
+	if r.exportVoyageNumber != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "exportVoyageNumber", r.exportVoyageNumber, "form", "")
+	}
+	if r.equipmentEventTypeCode != nil {
+		t := *r.equipmentEventTypeCode
+		if reflect.TypeOf(t).Kind() == reflect.Slice {
+			s := reflect.ValueOf(t)
+			for i := 0; i < s.Len(); i++ {
+				parameterAddToHeaderOrQuery(localVarQueryParams, "equipmentEventTypeCode", s.Index(i).Interface(), "form", "multi")
+			}
+		} else {
+			parameterAddToHeaderOrQuery(localVarQueryParams, "equipmentEventTypeCode", t, "form", "multi")
+		}
+	}
+	if r.carrierServiceCode != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "carrierServiceCode", r.carrierServiceCode, "form", "")
+	}
+	if r.eventType != nil {
+		t := *r.eventType
+		if reflect.TypeOf(t).Kind() == reflect.Slice {
+			s := reflect.ValueOf(t)
+			for i := 0; i < s.Len(); i++ {
+				parameterAddToHeaderOrQuery(localVarQueryParams, "eventType", s.Index(i).Interface(), "form", "multi")
+			}
+		} else {
+			parameterAddToHeaderOrQuery(localVarQueryParams, "eventType", t, "form", "multi")
+		}
+	}
+	if r.uNLocationCode != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "UNLocationCode", r.uNLocationCode, "form", "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -140,7 +257,7 @@ func (a *EventsApiService) V110GGetEventsExecute(r ApiV110GGetEventsRequest) (*E
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	if r.keyId != nil {
-		localVarHeaderParams["KeyId"] = parameterToString(*r.keyId, "")
+		parameterAddToHeaderOrQuery(localVarHeaderParams, "KeyId", r.keyId, "simple", "")
 	}
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
@@ -152,9 +269,9 @@ func (a *EventsApiService) V110GGetEventsExecute(r ApiV110GGetEventsRequest) (*E
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
 
-	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
@@ -164,15 +281,14 @@ func (a *EventsApiService) V110GGetEventsExecute(r ApiV110GGetEventsRequest) (*E
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		if localVarHTTPResponse.StatusCode == 400 {
-			var v ModelError
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-			newErr.model = v
+		var v ModelError
+		err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+		if err != nil {
+			newErr.error = err.Error()
+			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
+		newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+		newErr.model = v
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
 

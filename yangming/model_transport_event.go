@@ -15,7 +15,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"time"
 )
 
 // checks if the TransportEvent type satisfies the MappedNullable interface at compile time
@@ -26,13 +25,13 @@ type TransportEvent struct {
 	// The unique identifier for the event (the message - not the source).<br>NB: This field should be considered Metadata<br>
 	EventID *string `json:"eventID,omitempty"`
 	// The timestamp of when the event was created.<br>NB: This field should be considered Metadata<br>
-	EventCreatedDateTime time.Time `json:"eventCreatedDateTime"`
+	EventCreatedDateTime string `json:"eventCreatedDateTime"`
 	// The Event Type of the object - to be used as a discriminator. <br>NB: This field should be considered Metadata<br><br>Enum:<br>[ TRANSPORT ]<br>
 	EventType string `json:"eventType"`
 	// Code for the event classifier can be   - ACT (Actual)    - PLN (Planned)    - EST (Estimated)  Enum:<br>[ ACT, PLN, EST ]
 	EventClassifierCode string `json:"eventClassifierCode"`
 	// The local date and time, where the event took place or when the event will take place, in ISO 8601 format.
-	EventDateTime time.Time `json:"eventDateTime"`
+	EventDateTime string `json:"eventDateTime"`
 	// Identifier for type of Transport event   - ARRI (Arrived)   - DEPA (Departed)  More details can be found on GitHub<br><br>Enum:<br>[ ARRI, DEPA ]
 	TransportEventTypeCode string `json:"transportEventTypeCode"`
 	// <small>maxLength: 3</small><br>Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/
@@ -50,7 +49,7 @@ type _TransportEvent TransportEvent
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTransportEvent(eventCreatedDateTime time.Time, eventType string, eventClassifierCode string, eventDateTime time.Time, transportEventTypeCode string, transportCall TransportCall) *TransportEvent {
+func NewTransportEvent(eventCreatedDateTime string, eventType string, eventClassifierCode string, eventDateTime string, transportEventTypeCode string, transportCall TransportCall) *TransportEvent {
 	this := TransportEvent{}
 	this.EventCreatedDateTime = eventCreatedDateTime
 	this.EventType = eventType
@@ -102,9 +101,9 @@ func (o *TransportEvent) SetEventID(v string) {
 }
 
 // GetEventCreatedDateTime returns the EventCreatedDateTime field value
-func (o *TransportEvent) GetEventCreatedDateTime() time.Time {
+func (o *TransportEvent) GetEventCreatedDateTime() string {
 	if o == nil {
-		var ret time.Time
+		var ret string
 		return ret
 	}
 
@@ -113,7 +112,7 @@ func (o *TransportEvent) GetEventCreatedDateTime() time.Time {
 
 // GetEventCreatedDateTimeOk returns a tuple with the EventCreatedDateTime field value
 // and a boolean to check if the value has been set.
-func (o *TransportEvent) GetEventCreatedDateTimeOk() (*time.Time, bool) {
+func (o *TransportEvent) GetEventCreatedDateTimeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -121,7 +120,7 @@ func (o *TransportEvent) GetEventCreatedDateTimeOk() (*time.Time, bool) {
 }
 
 // SetEventCreatedDateTime sets field value
-func (o *TransportEvent) SetEventCreatedDateTime(v time.Time) {
+func (o *TransportEvent) SetEventCreatedDateTime(v string) {
 	o.EventCreatedDateTime = v
 }
 
@@ -174,9 +173,9 @@ func (o *TransportEvent) SetEventClassifierCode(v string) {
 }
 
 // GetEventDateTime returns the EventDateTime field value
-func (o *TransportEvent) GetEventDateTime() time.Time {
+func (o *TransportEvent) GetEventDateTime() string {
 	if o == nil {
-		var ret time.Time
+		var ret string
 		return ret
 	}
 
@@ -185,7 +184,7 @@ func (o *TransportEvent) GetEventDateTime() time.Time {
 
 // GetEventDateTimeOk returns a tuple with the EventDateTime field value
 // and a boolean to check if the value has been set.
-func (o *TransportEvent) GetEventDateTimeOk() (*time.Time, bool) {
+func (o *TransportEvent) GetEventDateTimeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -193,7 +192,7 @@ func (o *TransportEvent) GetEventDateTimeOk() (*time.Time, bool) {
 }
 
 // SetEventDateTime sets field value
-func (o *TransportEvent) SetEventDateTime(v time.Time) {
+func (o *TransportEvent) SetEventDateTime(v string) {
 	o.EventDateTime = v
 }
 

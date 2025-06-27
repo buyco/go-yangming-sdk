@@ -9,13 +9,13 @@ Name | Type | Description | Notes
 **Errors** | [**[]SubErrors**](SubErrors.md) |  | 
 **StatusCode** | **int32** | The HTTP status code. | 
 **StatusCodeText** | **string** | The textual representation of the response status. | 
-**ErrorDateTime** | **time.Time** | The date and time (in ISO 8601 format) the error occured. | 
+**ErrorDateTime** | **string** | The date and time (in ISO 8601 format) the error occured. | 
 
 ## Methods
 
 ### NewApiError
 
-`func NewApiError(httpMethod string, requestUri string, errors []SubErrors, statusCode int32, statusCodeText string, errorDateTime time.Time, ) *ApiError`
+`func NewApiError(httpMethod string, requestUri string, errors []SubErrors, statusCode int32, statusCodeText string, errorDateTime string, ) *ApiError`
 
 NewApiError instantiates a new ApiError object
 This constructor will assign default values to properties that have it defined,
@@ -132,20 +132,20 @@ SetStatusCodeText sets StatusCodeText field to given value.
 
 ### GetErrorDateTime
 
-`func (o *ApiError) GetErrorDateTime() time.Time`
+`func (o *ApiError) GetErrorDateTime() string`
 
 GetErrorDateTime returns the ErrorDateTime field if non-nil, zero value otherwise.
 
 ### GetErrorDateTimeOk
 
-`func (o *ApiError) GetErrorDateTimeOk() (*time.Time, bool)`
+`func (o *ApiError) GetErrorDateTimeOk() (*string, bool)`
 
 GetErrorDateTimeOk returns a tuple with the ErrorDateTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetErrorDateTime
 
-`func (o *ApiError) SetErrorDateTime(v time.Time)`
+`func (o *ApiError) SetErrorDateTime(v string)`
 
 SetErrorDateTime sets ErrorDateTime field to given value.
 

@@ -269,7 +269,6 @@
           "eventCreatedDateTime": {
             "type": "string",
             "description": "The timestamp of when the event was created.<br>NB: This field should be considered Metadata",
-            "format": "date-time",
             "example": "2021-01-09T14:12:56+01:00"
           },
           "eventType": {
@@ -285,7 +284,6 @@
           "eventDateTime": {
             "type": "string",
             "description": "The local date and time, where the event took place or when the event will take place, in ISO 8601 format.",
-            "format": "date-time",
             "example": "2019-11-12T07:41:00+08:30"
           },
           "equipmentEventTypeCode": {
@@ -533,7 +531,6 @@
           "eventCreatedDateTime": {
             "type": "string",
             "description": "The timestamp of when the event was created.<br>NB: This field should be considered Metadata<br>",
-            "format": "date-time",
             "example": "2021-01-09T14:12:56+01:00"
           },
           "eventType": {
@@ -549,7 +546,6 @@
           "eventDateTime": {
             "type": "string",
             "description": "The local date and time, where the event took place or when the event will take place, in ISO 8601 format.",
-            "format": "date-time",
             "example": "2019-11-12T07:41:00+08:30"
           },
           "transportEventTypeCode": {
@@ -665,7 +661,6 @@
           "errorDateTime": {
             "type": "string",
             "description": "The date and time (in ISO 8601 format) the error occured.",
-            "format": "date-time",
             "example": "2023-12-17T09:57:25+08:00"
           }
         }

@@ -15,7 +15,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"time"
 )
 
 // checks if the ApiError type satisfies the MappedNullable interface at compile time
@@ -33,7 +32,7 @@ type ApiError struct {
 	// The textual representation of the response status.
 	StatusCodeText string `json:"statusCodeText"`
 	// The date and time (in ISO 8601 format) the error occured.
-	ErrorDateTime time.Time `json:"errorDateTime"`
+	ErrorDateTime string `json:"errorDateTime"`
 }
 
 type _ApiError ApiError
@@ -42,7 +41,7 @@ type _ApiError ApiError
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewApiError(httpMethod string, requestUri string, errors []SubErrors, statusCode int32, statusCodeText string, errorDateTime time.Time) *ApiError {
+func NewApiError(httpMethod string, requestUri string, errors []SubErrors, statusCode int32, statusCodeText string, errorDateTime string) *ApiError {
 	this := ApiError{}
 	this.HttpMethod = httpMethod
 	this.RequestUri = requestUri
@@ -182,9 +181,9 @@ func (o *ApiError) SetStatusCodeText(v string) {
 }
 
 // GetErrorDateTime returns the ErrorDateTime field value
-func (o *ApiError) GetErrorDateTime() time.Time {
+func (o *ApiError) GetErrorDateTime() string {
 	if o == nil {
-		var ret time.Time
+		var ret string
 		return ret
 	}
 
@@ -193,7 +192,7 @@ func (o *ApiError) GetErrorDateTime() time.Time {
 
 // GetErrorDateTimeOk returns a tuple with the ErrorDateTime field value
 // and a boolean to check if the value has been set.
-func (o *ApiError) GetErrorDateTimeOk() (*time.Time, bool) {
+func (o *ApiError) GetErrorDateTimeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -201,7 +200,7 @@ func (o *ApiError) GetErrorDateTimeOk() (*time.Time, bool) {
 }
 
 // SetErrorDateTime sets field value
-func (o *ApiError) SetErrorDateTime(v time.Time) {
+func (o *ApiError) SetErrorDateTime(v string) {
 	o.ErrorDateTime = v
 }
 

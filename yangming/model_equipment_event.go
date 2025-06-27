@@ -15,7 +15,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"time"
 )
 
 // checks if the EquipmentEvent type satisfies the MappedNullable interface at compile time
@@ -26,13 +25,13 @@ type EquipmentEvent struct {
 	// The unique identifier for the event (the message - not the source).<br>NB: This field should be considered Metadata
 	EventID *string `json:"eventID,omitempty"`
 	// The timestamp of when the event was created.<br>NB: This field should be considered Metadata
-	EventCreatedDateTime time.Time `json:"eventCreatedDateTime"`
+	EventCreatedDateTime string `json:"eventCreatedDateTime"`
 	// The Event Type of the object - to be used as a discriminator. <br>NB: This field should be considered Metadata  Enum:  [ TRANSPORT ]
 	EventType string `json:"eventType"`
 	// Code for the event classifier can be    - ACT (Actual)   - PLN (Planned)   - EST (Estimated)  Enum:<br>[ ACT, PLN, EST ]
 	EventClassifierCode string `json:"eventClassifierCode"`
 	// The local date and time, where the event took place or when the event will take place, in ISO 8601 format.
-	EventDateTime time.Time `json:"eventDateTime"`
+	EventDateTime string `json:"eventDateTime"`
 	// Unique identifier for equipmentEventTypeCode.   - LOAD (Loaded)   - DISC (Discharged)   - GTIN (Gated in)   - GTOT (Gated out)   - STUF (Stuffed)   - STRP (Stripped)   - PICK (Pick-up)   - DROP (Drop-off)   - INSP (Inspected)   - RSEA (Resealed)   - RMVD (Removed)  More details can be found on GitHub <br><br>Enum:<br>[ LOAD, DISC, GTIN, GTOT, STUF, STRP, PICK, DROP, INSP, RSEA, RMVD ]
 	EquipmentEventTypeCode string `json:"equipmentEventTypeCode"`
 	// <small>maxLength: 15</small><br>The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.
@@ -55,7 +54,7 @@ type _EquipmentEvent EquipmentEvent
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEquipmentEvent(eventCreatedDateTime time.Time, eventType string, eventClassifierCode string, eventDateTime time.Time, equipmentEventTypeCode string, emptyIndicatorCode string) *EquipmentEvent {
+func NewEquipmentEvent(eventCreatedDateTime string, eventType string, eventClassifierCode string, eventDateTime string, equipmentEventTypeCode string, emptyIndicatorCode string) *EquipmentEvent {
 	this := EquipmentEvent{}
 	this.EventCreatedDateTime = eventCreatedDateTime
 	this.EventType = eventType
@@ -107,9 +106,9 @@ func (o *EquipmentEvent) SetEventID(v string) {
 }
 
 // GetEventCreatedDateTime returns the EventCreatedDateTime field value
-func (o *EquipmentEvent) GetEventCreatedDateTime() time.Time {
+func (o *EquipmentEvent) GetEventCreatedDateTime() string {
 	if o == nil {
-		var ret time.Time
+		var ret string
 		return ret
 	}
 
@@ -118,7 +117,7 @@ func (o *EquipmentEvent) GetEventCreatedDateTime() time.Time {
 
 // GetEventCreatedDateTimeOk returns a tuple with the EventCreatedDateTime field value
 // and a boolean to check if the value has been set.
-func (o *EquipmentEvent) GetEventCreatedDateTimeOk() (*time.Time, bool) {
+func (o *EquipmentEvent) GetEventCreatedDateTimeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -126,7 +125,7 @@ func (o *EquipmentEvent) GetEventCreatedDateTimeOk() (*time.Time, bool) {
 }
 
 // SetEventCreatedDateTime sets field value
-func (o *EquipmentEvent) SetEventCreatedDateTime(v time.Time) {
+func (o *EquipmentEvent) SetEventCreatedDateTime(v string) {
 	o.EventCreatedDateTime = v
 }
 
@@ -179,9 +178,9 @@ func (o *EquipmentEvent) SetEventClassifierCode(v string) {
 }
 
 // GetEventDateTime returns the EventDateTime field value
-func (o *EquipmentEvent) GetEventDateTime() time.Time {
+func (o *EquipmentEvent) GetEventDateTime() string {
 	if o == nil {
-		var ret time.Time
+		var ret string
 		return ret
 	}
 
@@ -190,7 +189,7 @@ func (o *EquipmentEvent) GetEventDateTime() time.Time {
 
 // GetEventDateTimeOk returns a tuple with the EventDateTime field value
 // and a boolean to check if the value has been set.
-func (o *EquipmentEvent) GetEventDateTimeOk() (*time.Time, bool) {
+func (o *EquipmentEvent) GetEventDateTimeOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -198,7 +197,7 @@ func (o *EquipmentEvent) GetEventDateTimeOk() (*time.Time, bool) {
 }
 
 // SetEventDateTime sets field value
-func (o *EquipmentEvent) SetEventDateTime(v time.Time) {
+func (o *EquipmentEvent) SetEventDateTime(v string) {
 	o.EventDateTime = v
 }
 

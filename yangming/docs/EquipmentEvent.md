@@ -5,10 +5,10 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **EventID** | Pointer to **string** | The unique identifier for the event (the message - not the source).&lt;br&gt;NB: This field should be considered Metadata | [optional] 
-**EventCreatedDateTime** | **time.Time** | The timestamp of when the event was created.&lt;br&gt;NB: This field should be considered Metadata | 
+**EventCreatedDateTime** | **string** | The timestamp of when the event was created.&lt;br&gt;NB: This field should be considered Metadata | 
 **EventType** | **string** | The Event Type of the object - to be used as a discriminator. &lt;br&gt;NB: This field should be considered Metadata  Enum:  [ TRANSPORT ] | 
 **EventClassifierCode** | **string** | Code for the event classifier can be    - ACT (Actual)   - PLN (Planned)   - EST (Estimated)  Enum:&lt;br&gt;[ ACT, PLN, EST ] | 
-**EventDateTime** | **time.Time** | The local date and time, where the event took place or when the event will take place, in ISO 8601 format. | 
+**EventDateTime** | **string** | The local date and time, where the event took place or when the event will take place, in ISO 8601 format. | 
 **EquipmentEventTypeCode** | **string** | Unique identifier for equipmentEventTypeCode.   - LOAD (Loaded)   - DISC (Discharged)   - GTIN (Gated in)   - GTOT (Gated out)   - STUF (Stuffed)   - STRP (Stripped)   - PICK (Pick-up)   - DROP (Drop-off)   - INSP (Inspected)   - RSEA (Resealed)   - RMVD (Removed)  More details can be found on GitHub &lt;br&gt;&lt;br&gt;Enum:&lt;br&gt;[ LOAD, DISC, GTIN, GTOT, STUF, STRP, PICK, DROP, INSP, RSEA, RMVD ] | 
 **EquipmentReference** | Pointer to **string** | &lt;small&gt;maxLength: 15&lt;/small&gt;&lt;br&gt;The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG. | [optional] 
 **ISOEquipmentCode** | Pointer to **string** | &lt;small&gt;maxLength: 4&lt;/small&gt;&lt;br&gt;Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard. | [optional] 
@@ -23,7 +23,7 @@ Name | Type | Description | Notes
 
 ### NewEquipmentEvent
 
-`func NewEquipmentEvent(eventCreatedDateTime time.Time, eventType string, eventClassifierCode string, eventDateTime time.Time, equipmentEventTypeCode string, emptyIndicatorCode string, ) *EquipmentEvent`
+`func NewEquipmentEvent(eventCreatedDateTime string, eventType string, eventClassifierCode string, eventDateTime string, equipmentEventTypeCode string, emptyIndicatorCode string, ) *EquipmentEvent`
 
 NewEquipmentEvent instantiates a new EquipmentEvent object
 This constructor will assign default values to properties that have it defined,
@@ -65,20 +65,20 @@ HasEventID returns a boolean if a field has been set.
 
 ### GetEventCreatedDateTime
 
-`func (o *EquipmentEvent) GetEventCreatedDateTime() time.Time`
+`func (o *EquipmentEvent) GetEventCreatedDateTime() string`
 
 GetEventCreatedDateTime returns the EventCreatedDateTime field if non-nil, zero value otherwise.
 
 ### GetEventCreatedDateTimeOk
 
-`func (o *EquipmentEvent) GetEventCreatedDateTimeOk() (*time.Time, bool)`
+`func (o *EquipmentEvent) GetEventCreatedDateTimeOk() (*string, bool)`
 
 GetEventCreatedDateTimeOk returns a tuple with the EventCreatedDateTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetEventCreatedDateTime
 
-`func (o *EquipmentEvent) SetEventCreatedDateTime(v time.Time)`
+`func (o *EquipmentEvent) SetEventCreatedDateTime(v string)`
 
 SetEventCreatedDateTime sets EventCreatedDateTime field to given value.
 
@@ -125,20 +125,20 @@ SetEventClassifierCode sets EventClassifierCode field to given value.
 
 ### GetEventDateTime
 
-`func (o *EquipmentEvent) GetEventDateTime() time.Time`
+`func (o *EquipmentEvent) GetEventDateTime() string`
 
 GetEventDateTime returns the EventDateTime field if non-nil, zero value otherwise.
 
 ### GetEventDateTimeOk
 
-`func (o *EquipmentEvent) GetEventDateTimeOk() (*time.Time, bool)`
+`func (o *EquipmentEvent) GetEventDateTimeOk() (*string, bool)`
 
 GetEventDateTimeOk returns a tuple with the EventDateTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetEventDateTime
 
-`func (o *EquipmentEvent) SetEventDateTime(v time.Time)`
+`func (o *EquipmentEvent) SetEventDateTime(v string)`
 
 SetEventDateTime sets EventDateTime field to given value.
 

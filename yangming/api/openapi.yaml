@@ -303,7 +303,6 @@ components:
           description: "The timestamp of when the event was created.<br>NB: This field\
             \ should be considered Metadata"
           example: 2021-01-09T14:12:56+01:00
-          format: date-time
           type: string
         eventType:
           description: |-
@@ -323,7 +322,6 @@ components:
           description: "The local date and time, where the event took place or when\
             \ the event will take place, in ISO 8601 format."
           example: 2019-11-12T07:41:00+08:30
-          format: date-time
           type: string
         equipmentEventTypeCode:
           description: "Unique identifier for equipmentEventTypeCode.\n\n - LOAD (Loaded)\r\
@@ -796,7 +794,6 @@ components:
           description: "The timestamp of when the event was created.<br>NB: This field\
             \ should be considered Metadata<br>"
           example: 2021-01-09T14:12:56+01:00
-          format: date-time
           type: string
         eventType:
           description: "The Event Type of the object - to be used as a discriminator.\
@@ -814,7 +811,6 @@ components:
           description: "The local date and time, where the event took place or when\
             \ the event will take place, in ISO 8601 format."
           example: 2019-11-12T07:41:00+08:30
-          format: date-time
           type: string
         transportEventTypeCode:
           description: "Identifier for type of Transport event\n\n - ARRI (Arrived)\r\
@@ -947,7 +943,6 @@ components:
         errorDateTime:
           description: The date and time (in ISO 8601 format) the error occured.
           example: 2023-12-17T09:57:25+08:00
-          format: date-time
           type: string
       required:
       - errorDateTime

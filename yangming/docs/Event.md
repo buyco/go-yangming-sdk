@@ -5,10 +5,10 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **EventID** | Pointer to **string** | The unique identifier for the event (the message - not the source).&lt;br&gt;NB: This field should be considered Metadata | [optional] 
-**EventCreatedDateTime** | **time.Time** | The timestamp of when the event was created.&lt;br&gt;NB: This field should be considered Metadata | 
+**EventCreatedDateTime** | **string** | The timestamp of when the event was created.&lt;br&gt;NB: This field should be considered Metadata | 
 **EventType** | **string** | The Event Type of the object - to be used as a discriminator. &lt;br&gt;NB: This field should be considered Metadata  Enum:  [ TRANSPORT ] | 
 **EventClassifierCode** | **string** | Code for the event classifier can be    - ACT (Actual)   - PLN (Planned)   - EST (Estimated)  Enum:&lt;br&gt;[ ACT, PLN, EST ] | 
-**EventDateTime** | **time.Time** | The local date and time, where the event took place or when the event will take place, in ISO 8601 format. | 
+**EventDateTime** | **string** | The local date and time, where the event took place or when the event will take place, in ISO 8601 format. | 
 **TransportEventTypeCode** | **string** | Identifier for type of Transport event   - ARRI (Arrived)   - DEPA (Departed)  More details can be found on GitHub&lt;br&gt;&lt;br&gt;Enum:&lt;br&gt;[ ARRI, DEPA ] | 
 **DelayReasonCode** | Pointer to **string** | &lt;small&gt;maxLength: 3&lt;/small&gt;&lt;br&gt;Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/ | [optional] 
 **ChangeRemark** | Pointer to **string** | &lt;small&gt;maxLength: 250&lt;/small&gt;&lt;br&gt;Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage. | [optional] 
@@ -26,7 +26,7 @@ Name | Type | Description | Notes
 
 ### NewEvent
 
-`func NewEvent(eventCreatedDateTime time.Time, eventType string, eventClassifierCode string, eventDateTime time.Time, transportEventTypeCode string, transportCall TransportCall, equipmentEventTypeCode string, emptyIndicatorCode string, ) *Event`
+`func NewEvent(eventCreatedDateTime string, eventType string, eventClassifierCode string, eventDateTime string, transportEventTypeCode string, transportCall TransportCall, equipmentEventTypeCode string, emptyIndicatorCode string, ) *Event`
 
 NewEvent instantiates a new Event object
 This constructor will assign default values to properties that have it defined,
@@ -68,20 +68,20 @@ HasEventID returns a boolean if a field has been set.
 
 ### GetEventCreatedDateTime
 
-`func (o *Event) GetEventCreatedDateTime() time.Time`
+`func (o *Event) GetEventCreatedDateTime() string`
 
 GetEventCreatedDateTime returns the EventCreatedDateTime field if non-nil, zero value otherwise.
 
 ### GetEventCreatedDateTimeOk
 
-`func (o *Event) GetEventCreatedDateTimeOk() (*time.Time, bool)`
+`func (o *Event) GetEventCreatedDateTimeOk() (*string, bool)`
 
 GetEventCreatedDateTimeOk returns a tuple with the EventCreatedDateTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetEventCreatedDateTime
 
-`func (o *Event) SetEventCreatedDateTime(v time.Time)`
+`func (o *Event) SetEventCreatedDateTime(v string)`
 
 SetEventCreatedDateTime sets EventCreatedDateTime field to given value.
 
@@ -128,20 +128,20 @@ SetEventClassifierCode sets EventClassifierCode field to given value.
 
 ### GetEventDateTime
 
-`func (o *Event) GetEventDateTime() time.Time`
+`func (o *Event) GetEventDateTime() string`
 
 GetEventDateTime returns the EventDateTime field if non-nil, zero value otherwise.
 
 ### GetEventDateTimeOk
 
-`func (o *Event) GetEventDateTimeOk() (*time.Time, bool)`
+`func (o *Event) GetEventDateTimeOk() (*string, bool)`
 
 GetEventDateTimeOk returns a tuple with the EventDateTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
 ### SetEventDateTime
 
-`func (o *Event) SetEventDateTime(v time.Time)`
+`func (o *Event) SetEventDateTime(v string)`
 
 SetEventDateTime sets EventDateTime field to given value.
 

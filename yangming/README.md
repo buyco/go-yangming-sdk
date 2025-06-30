@@ -88,7 +88,6 @@ Class | Method | HTTP request | Description
  - [DocumentReferences](docs/DocumentReferences.md)
  - [EquipmentEvent](docs/EquipmentEvent.md)
  - [Event](docs/Event.md)
- - [Events](docs/Events.md)
  - [Location](docs/Location.md)
  - [References](docs/References.md)
  - [Seal](docs/Seal.md)

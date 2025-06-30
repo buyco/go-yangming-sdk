@@ -346,17 +346,9 @@
         ]
       },
       "events": {
-        "required": [
-          "events"
-        ],
-        "type": "object",
-        "properties": {
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/event"
-            }
-          }
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/event"
         }
       },
       "location": {

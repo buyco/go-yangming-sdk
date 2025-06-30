@@ -40,8 +40,8 @@ type EventsAPI interface {
 	GetEvents(ctx context.Context) ApiGetEventsRequest
 
 	// GetEventsExecute executes the request
-	//  @return Events
-	GetEventsExecute(r ApiGetEventsRequest) (*Events, *http.Response, error)
+	//  @return []Event
+	GetEventsExecute(r ApiGetEventsRequest) ([]Event, *http.Response, error)
 }
 
 // EventsAPIService EventsAPI service
@@ -135,7 +135,7 @@ func (r ApiGetEventsRequest) UNLocationCode(uNLocationCode string) ApiGetEventsR
 	return r
 }
 
-func (r ApiGetEventsRequest) Execute() (*Events, *http.Response, error) {
+func (r ApiGetEventsRequest) Execute() ([]Event, *http.Response, error) {
 	return r.ApiService.GetEventsExecute(r)
 }
 
@@ -162,13 +162,13 @@ func (a *EventsAPIService) GetEvents(ctx context.Context) ApiGetEventsRequest {
 
 // Execute executes the request
 //
-//	@return Events
-func (a *EventsAPIService) GetEventsExecute(r ApiGetEventsRequest) (*Events, *http.Response, error) {
+//	@return []Event
+func (a *EventsAPIService) GetEventsExecute(r ApiGetEventsRequest) ([]Event, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *Events
+		localVarReturnValue []Event
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "EventsAPIService.GetEvents")

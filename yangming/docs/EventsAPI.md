@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 ## GetEvents
 
-> Events GetEvents(ctx).KeyId(keyId).CarrierBookingReference(carrierBookingReference).TransportDocumentReference(transportDocumentReference).EquipmentReference(equipmentReference).TransportEventTypeCode(transportEventTypeCode).VesselIMONumber(vesselIMONumber).TransportCallID(transportCallID).ExportVoyageNumber(exportVoyageNumber).EquipmentEventTypeCode(equipmentEventTypeCode).CarrierServiceCode(carrierServiceCode).EventType(eventType).UNLocationCode(uNLocationCode).Execute()
+> []Event GetEvents(ctx).KeyId(keyId).CarrierBookingReference(carrierBookingReference).TransportDocumentReference(transportDocumentReference).EquipmentReference(equipmentReference).TransportEventTypeCode(transportEventTypeCode).VesselIMONumber(vesselIMONumber).TransportCallID(transportCallID).ExportVoyageNumber(exportVoyageNumber).EquipmentEventTypeCode(equipmentEventTypeCode).CarrierServiceCode(carrierServiceCode).EventType(eventType).UNLocationCode(uNLocationCode).Execute()
 
 Find events.
 
@@ -49,7 +49,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error when calling `EventsAPI.GetEvents``: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
 	}
-	// response from `GetEvents`: Events
+	// response from `GetEvents`: []Event
 	fmt.Fprintf(os.Stdout, "Response from `EventsAPI.GetEvents`: %v\n", resp)
 }
 ```
@@ -80,7 +80,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Events**](Events.md)
+[**[]Event**](Event.md)
 
 ### Authorization
 

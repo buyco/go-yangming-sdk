@@ -11,7 +11,6 @@ docs/ApiError.md
 docs/DocumentReferences.md
 docs/EquipmentEvent.md
 docs/Event.md
-docs/Events.md
 docs/EventsAPI.md
 docs/Location.md
 docs/References.md
@@ -28,7 +27,6 @@ model_api_error.go
 model_document_references.go
 model_equipment_event.go
 model_event.go
-model_events.go
 model_location.go
 model_references.go
 model_seal.go

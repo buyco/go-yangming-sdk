@@ -310,8 +310,10 @@ components:
 
             Enum:
 
-            [ TRANSPORT ]
-          example: TRANSPORT
+            [ EQUIPMENT ]
+          enum:
+          - EQUIPMENT
+          example: EQUIPMENT
           type: string
         eventClassifierCode:
           description: "Code for the event classifier can be \n\n - ACT (Actual)\r\
@@ -392,6 +394,11 @@ components:
       anyOf:
       - $ref: '#/components/schemas/transportEvent'
       - $ref: '#/components/schemas/equipmentEvent'
+      discriminator:
+        mapping:
+          TRANSPORT: '#/components/schemas/transportEvent'
+          EQUIPMENT: '#/components/schemas/equipmentEvent'
+        propertyName: eventType
       type: object
     events:
       items:
@@ -686,6 +693,8 @@ components:
           description: "The Event Type of the object - to be used as a discriminator.\
             \ <br>NB: This field should be considered Metadata<br><br>Enum:<br>[ TRANSPORT\
             \ ]<br>"
+          enum:
+          - TRANSPORT
           example: TRANSPORT
           type: string
         eventClassifierCode:

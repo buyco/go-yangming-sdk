@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **EventID** | Pointer to **string** | The unique identifier for the event (the message - not the source).&lt;br&gt;NB: This field should be considered Metadata | [optional] 
 **EventCreatedDateTime** | **string** | The timestamp of when the event was created.&lt;br&gt;NB: This field should be considered Metadata | 
-**EventType** | **string** | The Event Type of the object - to be used as a discriminator. &lt;br&gt;NB: This field should be considered Metadata  Enum:  [ TRANSPORT ] | 
+**EventType** | **string** | The Event Type of the object - to be used as a discriminator. &lt;br&gt;NB: This field should be considered Metadata  Enum:  [ EQUIPMENT ] | 
 **EventClassifierCode** | **string** | Code for the event classifier can be    - ACT (Actual)   - PLN (Planned)   - EST (Estimated)  Enum:&lt;br&gt;[ ACT, PLN, EST ] | 
 **EventDateTime** | **string** | The local date and time, where the event took place or when the event will take place, in ISO 8601 format. | 
 **TransportEventTypeCode** | **string** | Identifier for type of Transport event   - ARRI (Arrived)   - DEPA (Departed)  More details can be found on GitHub&lt;br&gt;&lt;br&gt;Enum:&lt;br&gt;[ ARRI, DEPA ] | 

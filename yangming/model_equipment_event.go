@@ -26,7 +26,7 @@ type EquipmentEvent struct {
 	EventID *string `json:"eventID,omitempty"`
 	// The timestamp of when the event was created.<br>NB: This field should be considered Metadata
 	EventCreatedDateTime string `json:"eventCreatedDateTime"`
-	// The Event Type of the object - to be used as a discriminator. <br>NB: This field should be considered Metadata  Enum:  [ TRANSPORT ]
+	// The Event Type of the object - to be used as a discriminator. <br>NB: This field should be considered Metadata  Enum:  [ EQUIPMENT ]
 	EventType string `json:"eventType"`
 	// Code for the event classifier can be    - ACT (Actual)   - PLN (Planned)   - EST (Estimated)  Enum:<br>[ ACT, PLN, EST ]
 	EventClassifierCode string `json:"eventClassifierCode"`

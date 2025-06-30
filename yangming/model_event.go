@@ -16,6 +16,9 @@ import (
 	"fmt"
 )
 
+// checks if the Event type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Event{}
+
 // Event struct for Event
 type Event struct {
 	EquipmentEvent *EquipmentEvent
@@ -25,6 +28,77 @@ type Event struct {
 // Unmarshal JSON data into any of the pointers in the struct
 func (dst *Event) UnmarshalJSON(data []byte) error {
 	var err error
+	// use discriminator value to speed up the lookup
+	var jsonDict map[string]interface{}
+	err = json.Unmarshal(data, &jsonDict)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal JSON into map for the discriminator lookup")
+	}
+
+	// check if the discriminator value is 'EQUIPMENT'
+	if jsonDict["eventType"] == "EQUIPMENT" {
+		// try to unmarshal JSON data into EquipmentEvent
+		err = json.Unmarshal(data, &dst.EquipmentEvent)
+		if err == nil {
+			jsonEquipmentEvent, _ := json.Marshal(dst.EquipmentEvent)
+			if string(jsonEquipmentEvent) == "{}" { // empty struct
+				dst.EquipmentEvent = nil
+			} else {
+				return nil // data stored in dst.EquipmentEvent, return on the first match
+			}
+		} else {
+			dst.EquipmentEvent = nil
+		}
+	}
+
+	// check if the discriminator value is 'TRANSPORT'
+	if jsonDict["eventType"] == "TRANSPORT" {
+		// try to unmarshal JSON data into TransportEvent
+		err = json.Unmarshal(data, &dst.TransportEvent)
+		if err == nil {
+			jsonTransportEvent, _ := json.Marshal(dst.TransportEvent)
+			if string(jsonTransportEvent) == "{}" { // empty struct
+				dst.TransportEvent = nil
+			} else {
+				return nil // data stored in dst.TransportEvent, return on the first match
+			}
+		} else {
+			dst.TransportEvent = nil
+		}
+	}
+
+	// check if the discriminator value is 'equipmentEvent'
+	if jsonDict["eventType"] == "equipmentEvent" {
+		// try to unmarshal JSON data into EquipmentEvent
+		err = json.Unmarshal(data, &dst.EquipmentEvent)
+		if err == nil {
+			jsonEquipmentEvent, _ := json.Marshal(dst.EquipmentEvent)
+			if string(jsonEquipmentEvent) == "{}" { // empty struct
+				dst.EquipmentEvent = nil
+			} else {
+				return nil // data stored in dst.EquipmentEvent, return on the first match
+			}
+		} else {
+			dst.EquipmentEvent = nil
+		}
+	}
+
+	// check if the discriminator value is 'transportEvent'
+	if jsonDict["eventType"] == "transportEvent" {
+		// try to unmarshal JSON data into TransportEvent
+		err = json.Unmarshal(data, &dst.TransportEvent)
+		if err == nil {
+			jsonTransportEvent, _ := json.Marshal(dst.TransportEvent)
+			if string(jsonTransportEvent) == "{}" { // empty struct
+				dst.TransportEvent = nil
+			} else {
+				return nil // data stored in dst.TransportEvent, return on the first match
+			}
+		} else {
+			dst.TransportEvent = nil
+		}
+	}
+
 	// try to unmarshal JSON data into EquipmentEvent
 	err = json.Unmarshal(data, &dst.EquipmentEvent)
 	if err == nil {
@@ -62,6 +136,18 @@ func (src Event) MarshalJSON() ([]byte, error) {
 
 	if src.TransportEvent != nil {
 		return json.Marshal(&src.TransportEvent)
+	}
+
+	return nil, nil // no data in anyOf schemas
+}
+
+func (src Event) ToMap() (map[string]interface{}, error) {
+	if src.EquipmentEvent != nil {
+		return src.EquipmentEvent.ToMap()
+	}
+
+	if src.TransportEvent != nil {
+		return src.TransportEvent.ToMap()
 	}
 
 	return nil, nil // no data in anyOf schemas

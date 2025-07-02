@@ -9,13 +9,13 @@
     },
     "license": {
       "name": "Yang Ming Marine Transport - Website",
-      "url": "https://www.yangming.com"
+      "url": "https://e-solution.yangming.com"
     },
     "version": "DCSA Standard"
   },
   "servers": [
     {
-      "url": "https://api.yangming.com/open/dcsa/api/tnt"
+      "url": "https://apidoc.yangming.com"
     }
   ],
   "tags": [
@@ -25,14 +25,14 @@
     }
   ],
   "paths": {
-    "/1.1.0/events": {
+    "/v2/events": {
       "get": {
         "tags": [
           "Events"
         ],
-        "summary": "Find events by Booking Reference, Bill of Lading or Equipment Reference.",
-        "description": "Returns all events related to the query parameter. The endpoint requires at least 1 of the 3 query parameters to be used.",
-        "operationId": "v110GGetEvents",
+        "summary": "Find events.",
+        "description": "Returns all events filtered by the queryParameters. The endpoint requires at least 1 of the 3 query parameters. (Carrier Booking Reference, Equipment Reference, Transport Document Reference) \n\n**NB**: It is possible to combine queryParameters. When combining queryParameters be aware that it is also possible to make combinations that are mutual contradicting. \n\nExample: *shipmentEventTypeCode=DRFT and equipmentEventTypeCode=GTIN* \n\nSince there is no event that can be a ShipmentEvent and an EquipmentEvent at the same time **this will return an empty list!**\n",
+        "operationId": "GetEvents",
         "parameters": [
           {
             "name": "KeyId",
@@ -44,9 +44,9 @@
             }
           },
           {
-            "name": "bookingReference",
+            "name": "carrierBookingReference",
             "in": "query",
-            "description": "The identifier for a shipment, which is issued by and unique within each of the carriers.",
+            "description": "A set of unique characters provided by carrier to identify a booking.<br>Specifying this filter will only return events related to this particular carrierBookingReference.<br><small>*maxLength: 35*</small>",
             "required": false,
             "schema": {
               "type": "string"
@@ -54,9 +54,9 @@
             "example": "E123456789"
           },
           {
-            "name": "billOfLadingNumber",
+            "name": "transportDocumentReference",
             "in": "query",
-            "description": "Bill of lading number is an identifier that links to a shipment. Bill of Lading is the legal document issued to the customer, which confirms the carrier's receipt of the cargo from the customer acknowledging goods being shipped and specifying the terms of delivery.",
+            "description": "A unique number reference allocated by the shipping line to the transport document and the main number used for the tracking of the status of the shipment.<br>Specifying this filter will only return events related to this particular transportDocumentReference <br><small>*maxLength: 20*</small>",
             "required": false,
             "schema": {
               "type": "string"
@@ -66,12 +66,98 @@
           {
             "name": "equipmentReference",
             "in": "query",
-            "description": "The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.",
+            "description": "Will filter by the unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.<br>Specifying this filter will only return events related to this particular equipmentReference<br><small>*maxLength: 15*</small>",
             "required": false,
             "schema": {
               "type": "string"
             },
             "example": "YMLU1234567"
+          },
+          {
+            "name": "transportEventTypeCode",
+            "in": "query",
+            "description": "Identifier for type of Transport event to filter by\n\n - ARRI (Arrived)\r\n - DEPA (Departed)\n\nIt is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example *transportEventTypeCode=ARRI,DEPA* matches **both** Arrived (ARRI) and Departed (DEPA) transport events.<br>Default is all transportEventTypeCodes.<br>This filter is only relevant when filtering on TransportEvents<br>*Available values* : ARRI, DEPA<br>*Default value* : ARRI,DEPA<br>*Example* : List [\"ARRI\",\"DEPA\"]",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "vesselIMONumber",
+            "in": "query",
+            "description": "The identifier of vessel for which schedule details are published. Depending on schedule type, this may not be available yet.<br>Specifying this filter will only return events related to this particular vesselIMONumber. <br><small>*maxLength: 7*</small>",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": 9648714
+          },
+          {
+            "name": "transportCallID",
+            "in": "query",
+            "description": "ID uniquely identifying a transport call, to filter events by.<br>Specifying this filter will only return events related to this particular transportCallID <br><small>*maxLength: 100*</small>",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "exportVoyageNumber",
+            "in": "query",
+            "description": "Filter on the vessel operator-specific identifier of the export Voyage.<br>Specifying this filter will only return events related to this particular exportVoyageNumber. <br><small>*maxLength: 50*</small>",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "2103S"
+          },
+          {
+            "name": "equipmentEventTypeCode",
+            "in": "query",
+            "description": "Unique identifier for equipmentEventTypeCode.\n\n - LOAD (Loaded)\r\n - DISC (Discharged)\r\n - GTIN (Gated in)\r\n - GTOT (Gated out)\r\n - STUF (Stuffed)\r\n - STRP (Stripped)\r\n - PICK (Pick-up)\r\n - DROP (Drop-off)\r\n - INSP (Inspected)\r\n - RSEA (Resealed)\r\n - RMVD (Removed)\n\nIt is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example *equipmentEventTypeCode=GTIN,GTOT* matches **both** Gated in (GTIN) and Gated out (GTOT) equipment events.<br>Default is all equipmentEventTypeCodes.<br>This filter is only relevant when filtering on EquipmentEvents<br>*Available values* : LOAD, DISC, GTIN, GTOT, STUF, STRP, PICK, DROP, INSP, RSEA, RMVD<br>*Default value* : LOAD,DISC,GTIN,GTOT,STUF,STRP,PICK,DROP,INSP,RSEA,RMVD<br>*Example* : List [\"GTOT\",\"GTIN\"]",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "carrierServiceCode",
+            "in": "query",
+            "description": "Filter on the carrier specific identifier of the service.<br>Specifying this filter will only return events related to this particular carrierServiceCode.<br><small>*maxLength: 5*</small>",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "FE1"
+          },
+          {
+            "name": "eventType",
+            "in": "query",
+            "description": "The type of event(s) to filter by. Possible values are\n\n - TRANSPORT (Transport events)\r\n - EQUIPMENT (Equipment events)\n\nIt is possible to select multiple values by comma (,) separating them. For multiple values the OR-operator is used. For example eventType=TRANSPORT,EQUIPMENT matches both Transport and Equipment events.<br>Default value is all event types.<br>*Available values* : TRANSPORT, EQUIPMENT<br>*Example* : List [\"TRANSPORT\",\"EQUIPMENT\"]",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "UNLocationCode",
+            "in": "query",
+            "description": "The UN Location code specifying where the place is located.<br>Specifying this filter will only return events related to this particular UN Location code.<br><small>*maxLength: 5*</small>",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "FRPAR"
           }
         ],
         "responses": {
@@ -85,12 +171,12 @@
               }
             }
           },
-          "400": {
+          "default": {
             "description": "Unexpected error",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/error"
+                  "$ref": "#/components/schemas/apiError"
                 }
               }
             }
@@ -101,70 +187,152 @@
   },
   "components": {
     "schemas": {
+      "address": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "<small>maxLength: 100</small>\n\nName of the address",
+            "example": "Henrik"
+          },
+          "street": {
+            "type": "string",
+            "description": "<small>maxLength: 100</small>\n\nThe name of the street of the party’s address.",
+            "example": "Kronprincessegade"
+          },
+          "streetNumber": {
+            "type": "string",
+            "description": "<small>maxLength: 50</small>\n\nThe number of the street of the party’s address.",
+            "example": "54"
+          },
+          "floor": {
+            "type": "string",
+            "description": "<small>maxLength: 50</small>\n\nThe floor of the party’s street number.",
+            "example": "5. sal"
+          },
+          "postCode": {
+            "type": "string",
+            "description": "<small>maxLength: 10</small>\n\nThe post code of the party’s address.",
+            "example": "1306"
+          },
+          "city": {
+            "type": "string",
+            "description": "<small>maxLength: 65</small>\n\nThe city name of the party’s address.",
+            "example": "København"
+          },
+          "stateRegion": {
+            "type": "string",
+            "description": "<small>maxLength: 65</small>\n\nThe state/region of the party’s address.",
+            "example": "N/A"
+          },
+          "country": {
+            "type": "string",
+            "description": "<small>maxLength: 75</small>\n\nThe country of the party’s address.",
+            "example": "Denmark"
+          }
+        },
+        "description": "Address related information"
+      },
+      "documentReferences": {
+        "type": "object",
+        "properties": {
+          "documentReferenceType": {
+            "type": "string",
+            "description": "Describes where the documentReferenceValue is pointing to\n\nEnum:\n\n[ BKG (Booking), TRD (Transport Document) ]",
+            "example": "BKG"
+          },
+          "documentReferenceValue": {
+            "type": "string",
+            "description": "The value of the identifier the documentReferenceType is describing",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          }
+        },
+        "description": "An optional list of key-value (documentReferenceType-documentReferenceValue) pairs representing links to objects relevant to the event. The documentReferenceType-field is used to describe where the documentReferenceValue-field is pointing to."
+      },
       "equipmentEvent": {
         "required": [
-          "UNLocationCode",
           "emptyIndicatorCode",
-          "equipmentReference",
+          "equipmentEventTypeCode",
           "eventClassifierCode",
+          "eventCreatedDateTime",
           "eventDateTime",
-          "eventID",
-          "eventTypeCode",
-          "facilityCode",
-          "facilityTypeCode"
+          "eventType"
         ],
         "type": "object",
         "properties": {
           "eventID": {
             "type": "string",
-            "description": "The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.",
-            "example": "CTR_689389697_7"
+            "description": "The unique identifier for the event (the message - not the source).<br>NB: This field should be considered Metadata",
+            "format": "uuid",
+            "example": "3cecb101-7a1a-43a4-9d62-e88a131651e2"
           },
-          "eventDateTime": {
+          "eventCreatedDateTime": {
             "type": "string",
-            "description": "The local date and time, where the event took place, in ISO 8601 format.",
-            "format": "date-time",
-            "example": "2019-11-12T07:41:00+08:30"
+            "description": "The timestamp of when the event was created.<br>NB: This field should be considered Metadata",
+            "example": "2021-01-09T14:12:56+01:00"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "The Event Type of the object - to be used as a discriminator. <br>NB: This field should be considered Metadata\n\nEnum:\n\n[ EQUIPMENT ]",
+            "example": "EQUIPMENT",
+            "enum": [
+              "EQUIPMENT"
+            ]
           },
           "eventClassifierCode": {
             "type": "string",
-            "description": "Code for the event classifier, either PLN, ACT or EST.",
+            "description": "Code for the event classifier can be \n\n - ACT (Actual)\r\n - PLN (Planned)\r\n - EST (Estimated)\n\nEnum:<br>[ ACT, PLN, EST ]",
             "example": "ACT"
           },
-          "eventTypeCode": {
+          "eventDateTime": {
             "type": "string",
-            "description": "Unique identifier for Event Type Code.",
-            "example": "ARRI"
+            "description": "The local date and time, where the event took place or when the event will take place, in ISO 8601 format.",
+            "example": "2019-11-12T07:41:00+08:30"
+          },
+          "equipmentEventTypeCode": {
+            "type": "string",
+            "description": "Unique identifier for equipmentEventTypeCode.\n\n - LOAD (Loaded)\r\n - DISC (Discharged)\r\n - GTIN (Gated in)\r\n - GTOT (Gated out)\r\n - STUF (Stuffed)\r\n - STRP (Stripped)\r\n - PICK (Pick-up)\r\n - DROP (Drop-off)\r\n - INSP (Inspected)\r\n - RSEA (Resealed)\r\n - RMVD (Removed)\n\nMore details can be found on GitHub <br><br>Enum:<br>[ LOAD, DISC, GTIN, GTOT, STUF, STRP, PICK, DROP, INSP, RSEA, RMVD ]",
+            "example": "LOAD"
           },
           "equipmentReference": {
             "type": "string",
-            "description": "The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. If a container is not yet assigned to a shipment, the interface cannot return any information when an equipment reference is given as input. If a container is assigned to an (active) shipment, the interface returns information on the active shipment.",
-            "example": "YMLU1234567"
+            "description": "<small>maxLength: 15</small><br>The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. According to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.",
+            "example": "APZU4812090"
           },
-          "facilityTypeCode": {
+          "ISOEquipmentCode": {
             "type": "string",
-            "description": "The code to identify the specific type of facility.",
-            "example": "POTE"
-          },
-          "UNLocationCode": {
-            "type": "string",
-            "description": "The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.",
-            "example": "USNYC"
-          },
-          "facilityCode": {
-            "type": "string",
-            "description": "The code used for identifying the specific facility.",
-            "example": "AEAUHADT"
-          },
-          "otherFacility": {
-            "type": "string",
-            "description": "An alternative way to capture the facility when no standardized DCSA facility code can be found.",
-            "example": "Depot location or address"
+            "description": "<small>maxLength: 4</small><br>Unique code for the different equipment size/type used for transporting commodities. The code is a concatenation of ISO Equipment Size Code and ISO Equipment Type Code A and follows the ISO 6346 standard.",
+            "example": "22GP"
           },
           "emptyIndicatorCode": {
             "type": "string",
-            "description": "Code to denote whether the equipment is empty or laden.",
-            "example": "Empty"
+            "description": "Code to denote whether the equipment is empty or laden.\n\nEnum:\n\n[ EMPTY, LADEN ]",
+            "example": "EMPTY"
+          },
+          "eventLocation": {
+            "$ref": "#/components/schemas/location"
+          },
+          "transportCall": {
+            "$ref": "#/components/schemas/transportCall"
+          },
+          "documentReferences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/documentReferences"
+            }
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/references"
+            }
+          },
+          "seals": {
+            "type": "array",
+            "description": "addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination. Only available when querying with Transport Document Reference.",
+            "items": {
+              "$ref": "#/components/schemas/seal"
+            }
           }
         },
         "description": "The equipment event entity is a specialization of the event entity to support specification of data that only applies to an equipment event."
@@ -173,192 +341,291 @@
         "type": "object",
         "anyOf": [
           {
-            "$ref": "#/components/schemas/equipmentEvent"
-          },
-          {
             "$ref": "#/components/schemas/transportEvent"
           },
           {
-            "$ref": "#/components/schemas/transportEquipmentEvent"
+            "$ref": "#/components/schemas/equipmentEvent"
           }
-        ]
+        ],
+        "discriminator": {
+          "propertyName": "eventType",
+          "mapping": {
+            "TRANSPORT": "#/components/schemas/transportEvent",
+            "EQUIPMENT": "#/components/schemas/equipmentEvent"
+          }
+        }
       },
       "events": {
-        "required": [
-          "events"
-        ],
-        "type": "object",
-        "properties": {
-          "events": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/event"
-            }
-          }
-        },
-        "description": "List of events for shipment journey."
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/event"
+        }
       },
-      "transportEquipmentEvent": {
-        "required": [
-          "UNLocationCode",
-          "emptyIndicatorCode",
-          "equipmentReference",
-          "eventClassifierCode",
-          "eventDateTime",
-          "eventID",
-          "eventTypeCode",
-          "facilityCode",
-          "facilityTypeCode",
-          "modeOfTransportCode",
-          "transportLegReference",
-          "transportReference"
-        ],
+      "location": {
         "type": "object",
         "properties": {
-          "eventID": {
+          "locationName": {
             "type": "string",
-            "description": "The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.",
-            "example": "CTR_689389697_7"
+            "description": "<small>maxLength: 100</small><br>The name of the location.",
+            "example": "Eiffel Tower"
           },
-          "eventDateTime": {
+          "latitude": {
             "type": "string",
-            "description": "The local date and time, where the event took place, in ISO 8601 format.",
-            "format": "date-time",
-            "example": "2019-11-12T07:41:00+08:30"
+            "description": "<small>maxLength: 10</small><br>Geographic coordinate that specifies the north–south position of a point on the Earth's surface.",
+            "example": "48.85855"
           },
-          "eventClassifierCode": {
+          "longitude": {
             "type": "string",
-            "description": "Code for the event classifier, either PLN, ACT or EST.",
-            "example": "ACT"
-          },
-          "eventTypeCode": {
-            "type": "string",
-            "description": "Unique identifier for Event Type Code.",
-            "example": "ARRI"
-          },
-          "transportReference": {
-            "type": "string",
-            "description": "The reference for the transport, e.g. when the mode of transport is a vessel, the transport reference will be the vessel IMO number.",
-            "example": "9648714"
-          },
-          "transportLegReference": {
-            "type": "string",
-            "description": "The transport leg reference will be specific per mode of transport:\n\nVessel: Voyage number as specified by the vessel operator\n\nTruck: Not yet specified\n\nRail: Not yet specified\n\nBarge: Not yet specified.",
-            "example": "025E"
-          },
-          "equipmentReference": {
-            "type": "string",
-            "description": "The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible. If a container is not yet assigned to a shipment, the interface cannot return any information when an equipment reference is given as input. If a container is assigned to an (active) shipment, the interface returns information on the active shipment.",
-            "example": "YMLU1234567"
-          },
-          "facilityTypeCode": {
-            "type": "string",
-            "description": "The code to identify the specific type of facility.",
-            "example": "POTE"
+            "description": "<small>maxLength: 11</small><br>Geographic coordinate that specifies the east–west position of a point on the Earth's surface.",
+            "example": "2.294492036"
           },
           "UNLocationCode": {
             "type": "string",
-            "description": "The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.",
-            "example": "USNYC"
+            "description": "<small>maxLength: 5</small><br>The UN Location code specifying where the place is located.",
+            "example": "FRPAR"
           },
           "facilityCode": {
             "type": "string",
-            "description": "The code used for identifying the specific facility.",
-            "example": "AEAUHADT"
+            "description": "<small>nullable: false</small><br><small>maxLength: 6</small><br>The code used for identifying the specific facility. This code does not include the UN Location Code.",
+            "example": "ADT"
+          },
+          "facilityCodeListProvider": {
+            "type": "string",
+            "description": "The provider used for identifying the facility Code<br><br>Enum:<br>[ BIC, SMDG ]",
+            "example": "SMDG"
+          },
+          "address": {
+            "$ref": "#/components/schemas/address"
+          }
+        },
+        "description": "generally used to capture location-related data, also for locations without UN Location Codes."
+      },
+      "references": {
+        "required": [
+          "referenceType",
+          "referenceValue"
+        ],
+        "type": "object",
+        "properties": {
+          "referenceType": {
+            "type": "string",
+            "description": "The reference type codes defined by DCSA.\n\n - FF (Freight Forwarder’s Reference)\r\n - SI (Shipper’s Reference)\r\n - PO (Purchase Order Reference)\r\n - CR (Customer’s Reference)\r\n - AAO (Consignee’s Reference)\r\n - EQ (Equipment Reference)\n\nEnum:\n\n[ FF, SI, PO, CR, AAO, EQ ]",
+            "example": "FF"
+          },
+          "referenceValue": {
+            "type": "string",
+            "description": "<small>maxLength: 100</small>\n\nThe actual value of the reference."
+          }
+        },
+        "description": "references provided by the shipper or freight forwarder at the time of booking or at the time of providing shipping instruction. Carriers share it back when providing track and trace event updates, some are also printed on the B/L. Customers can use these references to track shipments in their internal systems."
+      },
+      "seal": {
+        "required": [
+          "sealNumber",
+          "sealType"
+        ],
+        "type": "object",
+        "properties": {
+          "sealNumber": {
+            "type": "string",
+            "description": "<small>maxLength: 15</small><br>Identifies a seal affixed to the container."
+          },
+          "sealSource": {
+            "type": "string",
+            "description": "The source of the seal, namely who has affixed the seal. This attribute links to the Seal Source ID defined in the Seal Source reference data entity.\n\n - CAR (Carrier)\r\n - SHI (Shipper)\r\n - PHY (Phytosanitary)\r\n - VET (Veterinary)\r\n - CUS (Customs)\n\nEnum:<br>[ CAR, SHI, PHY, VET, CUS ]",
+            "example": "CUS"
+          },
+          "sealType": {
+            "type": "string",
+            "description": "The type of seal. This attribute links to the Seal Type ID defined in the Seal Type reference data entity.\n\n - KLP (Keyless padlock)\r\n - BLT (Bolt)\r\n - WIR (Wire)\n\nEnum:<br>[ KLP, BLT, WIR ]",
+            "example": "WIR"
+          }
+        },
+        "description": "addresses the seal-related information associated with the shipment equipment. A seal is put on a shipment equipment once it is loaded. This seal is meant to stay on until the shipment equipment reaches its final destination. Only available when querying with Transport Document Reference."
+      },
+      "transportCall": {
+        "required": [
+          "modeOfTransport",
+          "transportCallID"
+        ],
+        "type": "object",
+        "properties": {
+          "transportCallID": {
+            "type": "string",
+            "description": "<small>maxLength: 100</small><br>The unique identifier for a transport call.  Only available if Mode of Transport is VESSEL.",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "carrierServiceCode": {
+            "type": "string",
+            "description": "<small>maxLength: 5</small><br>The code of the service for which the schedule details are published.",
+            "example": "FE1"
+          },
+          "exportVoyageNumber": {
+            "type": "string",
+            "description": "<small>maxLength: 50</small><br>The vessel operator-specific identifier of the export Voyage.",
+            "example": "2103S"
+          },
+          "importVoyageNumber": {
+            "type": "string",
+            "description": "<small>maxLength: 50</small><br>The vessel operator-specific identifier of the import Voyage.",
+            "example": "2103N"
+          },
+          "transportCallSequenceNumber": {
+            "type": "integer",
+            "description": "Transport operator's key that uniquely identifies each individual call. This key is essential to distinguish between two separate calls at the same location within one voyage.",
+            "format": "int32",
+            "example": 2
+          },
+          "UNLocationCode": {
+            "type": "string",
+            "description": "<small>maxLength: 5</small><br>The UN Location code specifying where the place is located.",
+            "example": "FRPAR"
+          },
+          "facilityCode": {
+            "type": "string",
+            "description": "<small>nullable: false</small><br><small>maxLength: 6</small><br>The code used for identifying the specific facility. This code does not include the UN Location Code.",
+            "example": "ADT"
+          },
+          "facilityCodeListProvider": {
+            "type": "string",
+            "description": "The provider used for identifying the facility Code<br><br>Enum:<br>[ BIC, SMDG ]",
+            "example": "SMDG"
+          },
+          "facilityTypeCode": {
+            "type": "string",
+            "description": "A specialized version of the facilityCode to be used in TransportCalls. The code to identify the specific type of facility.\n\n - BOCR (Border crossing)\r\n - CLOC (Customer location)\r\n - COFS (Container freight station)\r\n - COYA (Deprecated - use OFFD intead)\r\n - OFFD (Off dock storage)\r\n - DEPO (Depot)\r\n - INTE (Inland terminal)\r\n - POTE (Port terminal)\r\n - RAMP (Ramp)\n\nEnum:<br>[ BOCR, CLOC, COFS, COYA, OFFD, DEPO, INTE, POTE, RAMP ]",
+            "example": "POTE"
           },
           "otherFacility": {
             "type": "string",
-            "description": "An alternative way to capture the facility when no standardized DCSA facility code can be found.",
+            "description": "<small>maxLength: 50</small><br>An alternative way to capture the facility when no standardized DCSA facility code can be found.",
             "example": "Depot location or address"
           },
-          "emptyIndicatorCode": {
+          "modeOfTransport": {
             "type": "string",
-            "description": "Code to denote whether the equipment is empty or laden.",
-            "example": "Empty"
+            "description": "The mode of transport as defined by DCSA.<br><br>Enum:<br>[ VESSEL, RAIL, TRUCK, BARGE ]"
           },
-          "modeOfTransportCode": {
-            "type": "string",
-            "description": "A code specifying a type of transport mode.",
-            "example": "1"
+          "location": {
+            "$ref": "#/components/schemas/location"
+          },
+          "vessel": {
+            "$ref": "#/components/schemas/vessel"
           }
-        },
-        "description": "The transport equipment event entity is a specialization of the event entity to support specification of data that applies to both transport and equipment events."
+        }
       },
       "transportEvent": {
         "required": [
-          "UNLocationCode",
           "eventClassifierCode",
+          "eventCreatedDateTime",
           "eventDateTime",
-          "eventID",
-          "eventTypeCode",
-          "facilityCode",
-          "facilityTypeCode",
-          "modeOfTransportCode",
-          "transportLegReference",
-          "transportReference"
+          "eventType",
+          "transportCall",
+          "transportEventTypeCode"
         ],
         "type": "object",
         "properties": {
           "eventID": {
             "type": "string",
-            "description": "The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID.",
-            "example": "CTR_689389697_7"
+            "description": "The unique identifier for the event (the message - not the source).<br>NB: This field should be considered Metadata<br>",
+            "format": "uuid",
+            "example": "3cecb101-7a1a-43a4-9d62-e88a131651e2"
           },
-          "eventDateTime": {
+          "eventCreatedDateTime": {
             "type": "string",
-            "description": "The local date and time, where the event took place, in ISO 8601 format.",
-            "format": "date-time",
-            "example": "2019-11-12T07:41:00+08:30"
+            "description": "The timestamp of when the event was created.<br>NB: This field should be considered Metadata<br>",
+            "example": "2021-01-09T14:12:56+01:00"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "The Event Type of the object - to be used as a discriminator. <br>NB: This field should be considered Metadata<br><br>Enum:<br>[ TRANSPORT ]<br>",
+            "example": "TRANSPORT",
+            "enum": [
+              "TRANSPORT"
+            ]
           },
           "eventClassifierCode": {
             "type": "string",
-            "description": "Code for the event classifier, either PLN, ACT or EST.",
+            "description": "Code for the event classifier can be\n\n - ACT (Actual)\r\n  - PLN (Planned)\r\n  - EST (Estimated)\n\nEnum:<br>[ ACT, PLN, EST ]",
             "example": "ACT"
           },
-          "eventTypeCode": {
+          "eventDateTime": {
             "type": "string",
-            "description": "Unique identifier for Event Type Code.",
+            "description": "The local date and time, where the event took place or when the event will take place, in ISO 8601 format.",
+            "example": "2019-11-12T07:41:00+08:30"
+          },
+          "transportEventTypeCode": {
+            "type": "string",
+            "description": "Identifier for type of Transport event\n\n - ARRI (Arrived)\r\n - DEPA (Departed)\n\nMore details can be found on GitHub<br><br>Enum:<br>[ ARRI, DEPA ]",
             "example": "ARRI"
           },
-          "transportReference": {
+          "delayReasonCode": {
             "type": "string",
-            "description": "The reference for the transport, e.g. when the mode of transport is a vessel, the transport reference will be the vessel IMO number.",
-            "example": "9648714"
+            "description": "<small>maxLength: 3</small><br>Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/",
+            "example": "WEA"
           },
-          "transportLegReference": {
+          "changeRemark": {
             "type": "string",
-            "description": "The transport leg reference will be specific per mode of transport:\n\nVessel: Voyage number as specified by the vessel operator\n\nTruck: Not yet specified\n\nRail: Not yet specified\n\nBarge: Not yet specified.",
-            "example": "025E"
+            "description": "<small>maxLength: 250</small><br>Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.",
+            "example": "Bad weather"
           },
-          "facilityTypeCode": {
-            "type": "string",
-            "description": "The code to identify the specific type of facility.",
-            "example": "POTE"
+          "transportCall": {
+            "$ref": "#/components/schemas/transportCall"
           },
-          "UNLocationCode": {
-            "type": "string",
-            "description": "The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country.",
-            "example": "USNYC"
+          "documentReferences": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/documentReferences"
+            }
           },
-          "facilityCode": {
-            "type": "string",
-            "description": "The code used for identifying the specific facility.",
-            "example": "AEAUHADT"
-          },
-          "otherFacility": {
-            "type": "string",
-            "description": "An alternative way to capture the facility when no standardized DCSA facility code can be found.",
-            "example": "Depot location or address"
-          },
-          "modeOfTransportCode": {
-            "type": "string",
-            "description": "A code specifying a type of transport mode.",
-            "example": "1"
+          "references": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/references"
+            }
           }
         },
         "description": "The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event."
       },
-      "error": {
+      "vessel": {
+        "required": [
+          "vesselIMONumber"
+        ],
+        "type": "object",
+        "properties": {
+          "vesselIMONumber": {
+            "type": "string",
+            "description": "<small>maxLength: 7</small><br>The unique reference for a registered Vessel. The reference is the International Maritime Organisation (IMO) number, also sometimes known as the Lloyd's register code, which does not change during the lifetime of the vessel",
+            "example": "9321483"
+          },
+          "vesselName": {
+            "type": "string",
+            "description": "<small>maxLength: 35</small><br>The name of the Vessel given by the Vessel Operator and registered with IMO.",
+            "example": "King of the Seas"
+          },
+          "vesselFlag": {
+            "type": "string",
+            "description": "<small>maxLength: 2</small><br>The flag of the nation whose laws the vessel is registered under. This is the ISO 3166 two-letter country code",
+            "example": "DE"
+          },
+          "vesselCallSignNumber": {
+            "type": "string",
+            "description": "<small>maxLength: 10</small><br>A unique alphanumeric identity that belongs to the vessel and is assigned by the International Telecommunication Union (ITU). It consists of a threeletter alphanumeric prefix that indicates nationality, followed by one to four characters to identify the individual vessel. For instance, vessels registered under Denmark are assigned the prefix ranges 5PA-5QZ, OUAOZZ, and XPA-XPZ. The Call Sign changes whenever a vessel changes its flag.",
+            "example": "NCVV"
+          },
+          "vesselOperatorCarrierCode": {
+            "type": "string",
+            "description": "<small>maxLength: 10</small><br><small>nullable: false</small>\n\nThe carrier who is in charge of the vessel operation based on either the SMDG or SCAC code lists",
+            "example": "MAEU"
+          },
+          "vesselOperatorCarrierCodeListProvider": {
+            "type": "string",
+            "description": "<small>nullable: false</small><br>Identifies the code list provider used for the operator and partner carriercodes.<br><br>Enum:<br>[ SMDG, NMFTA ]",
+            "example": "NMFTA"
+          }
+        },
+        "description": "describes a floating, sea going structure (mother vessels and feeder vessels) with either an internal or external mode of propulsion designed for the transport of cargo and/or passengers. Ocean vessels are uniquely identified by an IMO number consisting of 7 digits, or alternatively by their AIS signal with an MMSI number."
+      },
+      "apiError": {
         "required": [
           "errorDateTime",
           "errors",
@@ -377,12 +644,12 @@
           "requestUri": {
             "type": "string",
             "description": "The request URI.",
-            "example": "https://api.yangming.com/open/dcsa/api/tnt/1.1.0/events"
+            "example": "https://api.yangming.com/open/dcsa/api/tnt/v2/events"
           },
           "errors": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/errors"
+              "$ref": "#/components/schemas/subErrors"
             }
           },
           "statusCode": {
@@ -399,11 +666,11 @@
           "errorDateTime": {
             "type": "string",
             "description": "The date and time (in ISO 8601 format) the error occured.",
-            "example": "2020-12-17T09:57:25+08:00"
+            "example": "2023-12-17T09:57:25+08:00"
           }
         }
       },
-      "errors": {
+      "subErrors": {
         "required": [
           "message",
           "reason"
@@ -412,13 +679,13 @@
         "properties": {
           "reason": {
             "type": "string",
-            "description": "High level error message:\n\n 1.invalidQuery\n\n 2.noDataFound\n\n 3.systemException.",
-            "example": "systemException"
+            "description": "High level error message",
+            "example": "invalidQuery"
           },
           "message": {
             "type": "string",
-            "description": "Detailed error message:\n\n 1.invalidQuery: The request did not contain one of the three required query parameters.\n\n 2.noDataFound: No data found for given parameters.\n\n 3.systemException: Exception occurs when calling the API.",
-            "example": "Exception occurs when calling the API."
+            "description": "Detailed error message.",
+            "example": "The request did not contain one of the three required query parameters."
           }
         }
       }

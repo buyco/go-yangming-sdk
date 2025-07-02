@@ -1,4 +1,4 @@
-DOCKER_BUILD := docker run --rm -u `id -u` -v ${PWD}:/sdk openapitools/openapi-generator-cli:v5.4.0 generate -i sdk/api_files/yangming_track_and_trace.json
+DOCKER_BUILD := docker run --rm -u `id -u` -v ${PWD}:/sdk openapitools/openapi-generator-cli:v7.12.0 generate -i sdk/api_files/yangming_track_and_trace.json
 GO_CLIENT := -g go -o /sdk/yangming \
 			--git-repo-id=go-yangming-sdk --git-user-id=buyco \
 			--additional-properties=packageName=yangming \
@@ -14,7 +14,11 @@ go-sdk:
 	${DOCKER_BUILD} ${GO_CLIENT}
 
 clean:
-	rm -rf ./one
+	rm -rf ./yangming
+
+## fmt: Run go fmt
+fmt:
+	gofmt -w -s ./yangming 1>&2
 
 .PHONY: help
 all: help

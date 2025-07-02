@@ -4,23 +4,23 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**EventID** | **string** | The unique identifier for the Equipment Event ID/Transport Event ID/Shipment Event ID. | 
-**EventDateTime** | **time.Time** | The local date and time, where the event took place, in ISO 8601 format. | 
-**EventClassifierCode** | **string** | Code for the event classifier, either PLN, ACT or EST. | 
-**EventTypeCode** | **string** | Unique identifier for Event Type Code. | 
-**TransportReference** | **string** | The reference for the transport, e.g. when the mode of transport is a vessel, the transport reference will be the vessel IMO number. | 
-**TransportLegReference** | **string** | The transport leg reference will be specific per mode of transport:  Vessel: Voyage number as specified by the vessel operator  Truck: Not yet specified  Rail: Not yet specified  Barge: Not yet specified. | 
-**FacilityTypeCode** | **string** | The code to identify the specific type of facility. | 
-**UNLocationCode** | **string** | The UN Location Code identifies a location in the sense of a city/a town/a village, being the smaller administrative area existing as defined by the competent national authority in each country. | 
-**FacilityCode** | **string** | The code used for identifying the specific facility. | 
-**OtherFacility** | Pointer to **string** | An alternative way to capture the facility when no standardized DCSA facility code can be found. | [optional] 
-**ModeOfTransportCode** | **string** | A code specifying a type of transport mode. | 
+**EventID** | Pointer to **string** | The unique identifier for the event (the message - not the source).&lt;br&gt;NB: This field should be considered Metadata&lt;br&gt; | [optional] 
+**EventCreatedDateTime** | **string** | The timestamp of when the event was created.&lt;br&gt;NB: This field should be considered Metadata&lt;br&gt; | 
+**EventType** | **string** | The Event Type of the object - to be used as a discriminator. &lt;br&gt;NB: This field should be considered Metadata&lt;br&gt;&lt;br&gt;Enum:&lt;br&gt;[ TRANSPORT ]&lt;br&gt; | 
+**EventClassifierCode** | **string** | Code for the event classifier can be   - ACT (Actual)    - PLN (Planned)    - EST (Estimated)  Enum:&lt;br&gt;[ ACT, PLN, EST ] | 
+**EventDateTime** | **string** | The local date and time, where the event took place or when the event will take place, in ISO 8601 format. | 
+**TransportEventTypeCode** | **string** | Identifier for type of Transport event   - ARRI (Arrived)   - DEPA (Departed)  More details can be found on GitHub&lt;br&gt;&lt;br&gt;Enum:&lt;br&gt;[ ARRI, DEPA ] | 
+**DelayReasonCode** | Pointer to **string** | &lt;small&gt;maxLength: 3&lt;/small&gt;&lt;br&gt;Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/ | [optional] 
+**ChangeRemark** | Pointer to **string** | &lt;small&gt;maxLength: 250&lt;/small&gt;&lt;br&gt;Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage. | [optional] 
+**TransportCall** | [**TransportCall**](TransportCall.md) |  | 
+**DocumentReferences** | Pointer to [**[]DocumentReferences**](DocumentReferences.md) |  | [optional] 
+**References** | Pointer to [**[]References**](References.md) |  | [optional] 
 
 ## Methods
 
 ### NewTransportEvent
 
-`func NewTransportEvent(eventID string, eventDateTime time.Time, eventClassifierCode string, eventTypeCode string, transportReference string, transportLegReference string, facilityTypeCode string, uNLocationCode string, facilityCode string, modeOfTransportCode string, ) *TransportEvent`
+`func NewTransportEvent(eventCreatedDateTime string, eventType string, eventClassifierCode string, eventDateTime string, transportEventTypeCode string, transportCall TransportCall, ) *TransportEvent`
 
 NewTransportEvent instantiates a new TransportEvent object
 This constructor will assign default values to properties that have it defined,
@@ -54,25 +54,50 @@ and a boolean to check if the value has been set.
 
 SetEventID sets EventID field to given value.
 
+### HasEventID
 
-### GetEventDateTime
+`func (o *TransportEvent) HasEventID() bool`
 
-`func (o *TransportEvent) GetEventDateTime() time.Time`
+HasEventID returns a boolean if a field has been set.
 
-GetEventDateTime returns the EventDateTime field if non-nil, zero value otherwise.
+### GetEventCreatedDateTime
 
-### GetEventDateTimeOk
+`func (o *TransportEvent) GetEventCreatedDateTime() string`
 
-`func (o *TransportEvent) GetEventDateTimeOk() (*time.Time, bool)`
+GetEventCreatedDateTime returns the EventCreatedDateTime field if non-nil, zero value otherwise.
 
-GetEventDateTimeOk returns a tuple with the EventDateTime field if it's non-nil, zero value otherwise
+### GetEventCreatedDateTimeOk
+
+`func (o *TransportEvent) GetEventCreatedDateTimeOk() (*string, bool)`
+
+GetEventCreatedDateTimeOk returns a tuple with the EventCreatedDateTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetEventDateTime
+### SetEventCreatedDateTime
 
-`func (o *TransportEvent) SetEventDateTime(v time.Time)`
+`func (o *TransportEvent) SetEventCreatedDateTime(v string)`
 
-SetEventDateTime sets EventDateTime field to given value.
+SetEventCreatedDateTime sets EventCreatedDateTime field to given value.
+
+
+### GetEventType
+
+`func (o *TransportEvent) GetEventType() string`
+
+GetEventType returns the EventType field if non-nil, zero value otherwise.
+
+### GetEventTypeOk
+
+`func (o *TransportEvent) GetEventTypeOk() (*string, bool)`
+
+GetEventTypeOk returns a tuple with the EventType field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetEventType
+
+`func (o *TransportEvent) SetEventType(v string)`
+
+SetEventType sets EventType field to given value.
 
 
 ### GetEventClassifierCode
@@ -95,170 +120,165 @@ and a boolean to check if the value has been set.
 SetEventClassifierCode sets EventClassifierCode field to given value.
 
 
-### GetEventTypeCode
+### GetEventDateTime
 
-`func (o *TransportEvent) GetEventTypeCode() string`
+`func (o *TransportEvent) GetEventDateTime() string`
 
-GetEventTypeCode returns the EventTypeCode field if non-nil, zero value otherwise.
+GetEventDateTime returns the EventDateTime field if non-nil, zero value otherwise.
 
-### GetEventTypeCodeOk
+### GetEventDateTimeOk
 
-`func (o *TransportEvent) GetEventTypeCodeOk() (*string, bool)`
+`func (o *TransportEvent) GetEventDateTimeOk() (*string, bool)`
 
-GetEventTypeCodeOk returns a tuple with the EventTypeCode field if it's non-nil, zero value otherwise
+GetEventDateTimeOk returns a tuple with the EventDateTime field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetEventTypeCode
+### SetEventDateTime
 
-`func (o *TransportEvent) SetEventTypeCode(v string)`
+`func (o *TransportEvent) SetEventDateTime(v string)`
 
-SetEventTypeCode sets EventTypeCode field to given value.
+SetEventDateTime sets EventDateTime field to given value.
 
 
-### GetTransportReference
+### GetTransportEventTypeCode
 
-`func (o *TransportEvent) GetTransportReference() string`
+`func (o *TransportEvent) GetTransportEventTypeCode() string`
 
-GetTransportReference returns the TransportReference field if non-nil, zero value otherwise.
+GetTransportEventTypeCode returns the TransportEventTypeCode field if non-nil, zero value otherwise.
 
-### GetTransportReferenceOk
+### GetTransportEventTypeCodeOk
 
-`func (o *TransportEvent) GetTransportReferenceOk() (*string, bool)`
+`func (o *TransportEvent) GetTransportEventTypeCodeOk() (*string, bool)`
 
-GetTransportReferenceOk returns a tuple with the TransportReference field if it's non-nil, zero value otherwise
+GetTransportEventTypeCodeOk returns a tuple with the TransportEventTypeCode field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetTransportReference
+### SetTransportEventTypeCode
 
-`func (o *TransportEvent) SetTransportReference(v string)`
+`func (o *TransportEvent) SetTransportEventTypeCode(v string)`
 
-SetTransportReference sets TransportReference field to given value.
+SetTransportEventTypeCode sets TransportEventTypeCode field to given value.
 
 
-### GetTransportLegReference
+### GetDelayReasonCode
 
-`func (o *TransportEvent) GetTransportLegReference() string`
+`func (o *TransportEvent) GetDelayReasonCode() string`
 
-GetTransportLegReference returns the TransportLegReference field if non-nil, zero value otherwise.
+GetDelayReasonCode returns the DelayReasonCode field if non-nil, zero value otherwise.
 
-### GetTransportLegReferenceOk
+### GetDelayReasonCodeOk
 
-`func (o *TransportEvent) GetTransportLegReferenceOk() (*string, bool)`
+`func (o *TransportEvent) GetDelayReasonCodeOk() (*string, bool)`
 
-GetTransportLegReferenceOk returns a tuple with the TransportLegReference field if it's non-nil, zero value otherwise
+GetDelayReasonCodeOk returns a tuple with the DelayReasonCode field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetTransportLegReference
+### SetDelayReasonCode
 
-`func (o *TransportEvent) SetTransportLegReference(v string)`
+`func (o *TransportEvent) SetDelayReasonCode(v string)`
 
-SetTransportLegReference sets TransportLegReference field to given value.
+SetDelayReasonCode sets DelayReasonCode field to given value.
 
+### HasDelayReasonCode
 
-### GetFacilityTypeCode
+`func (o *TransportEvent) HasDelayReasonCode() bool`
 
-`func (o *TransportEvent) GetFacilityTypeCode() string`
+HasDelayReasonCode returns a boolean if a field has been set.
 
-GetFacilityTypeCode returns the FacilityTypeCode field if non-nil, zero value otherwise.
+### GetChangeRemark
 
-### GetFacilityTypeCodeOk
+`func (o *TransportEvent) GetChangeRemark() string`
 
-`func (o *TransportEvent) GetFacilityTypeCodeOk() (*string, bool)`
+GetChangeRemark returns the ChangeRemark field if non-nil, zero value otherwise.
 
-GetFacilityTypeCodeOk returns a tuple with the FacilityTypeCode field if it's non-nil, zero value otherwise
+### GetChangeRemarkOk
+
+`func (o *TransportEvent) GetChangeRemarkOk() (*string, bool)`
+
+GetChangeRemarkOk returns a tuple with the ChangeRemark field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetFacilityTypeCode
+### SetChangeRemark
 
-`func (o *TransportEvent) SetFacilityTypeCode(v string)`
+`func (o *TransportEvent) SetChangeRemark(v string)`
 
-SetFacilityTypeCode sets FacilityTypeCode field to given value.
+SetChangeRemark sets ChangeRemark field to given value.
 
+### HasChangeRemark
 
-### GetUNLocationCode
+`func (o *TransportEvent) HasChangeRemark() bool`
 
-`func (o *TransportEvent) GetUNLocationCode() string`
+HasChangeRemark returns a boolean if a field has been set.
 
-GetUNLocationCode returns the UNLocationCode field if non-nil, zero value otherwise.
+### GetTransportCall
 
-### GetUNLocationCodeOk
+`func (o *TransportEvent) GetTransportCall() TransportCall`
 
-`func (o *TransportEvent) GetUNLocationCodeOk() (*string, bool)`
+GetTransportCall returns the TransportCall field if non-nil, zero value otherwise.
 
-GetUNLocationCodeOk returns a tuple with the UNLocationCode field if it's non-nil, zero value otherwise
+### GetTransportCallOk
+
+`func (o *TransportEvent) GetTransportCallOk() (*TransportCall, bool)`
+
+GetTransportCallOk returns a tuple with the TransportCall field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetUNLocationCode
+### SetTransportCall
 
-`func (o *TransportEvent) SetUNLocationCode(v string)`
+`func (o *TransportEvent) SetTransportCall(v TransportCall)`
 
-SetUNLocationCode sets UNLocationCode field to given value.
+SetTransportCall sets TransportCall field to given value.
 
 
-### GetFacilityCode
+### GetDocumentReferences
 
-`func (o *TransportEvent) GetFacilityCode() string`
+`func (o *TransportEvent) GetDocumentReferences() []DocumentReferences`
 
-GetFacilityCode returns the FacilityCode field if non-nil, zero value otherwise.
+GetDocumentReferences returns the DocumentReferences field if non-nil, zero value otherwise.
 
-### GetFacilityCodeOk
+### GetDocumentReferencesOk
 
-`func (o *TransportEvent) GetFacilityCodeOk() (*string, bool)`
+`func (o *TransportEvent) GetDocumentReferencesOk() (*[]DocumentReferences, bool)`
 
-GetFacilityCodeOk returns a tuple with the FacilityCode field if it's non-nil, zero value otherwise
+GetDocumentReferencesOk returns a tuple with the DocumentReferences field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetFacilityCode
+### SetDocumentReferences
 
-`func (o *TransportEvent) SetFacilityCode(v string)`
+`func (o *TransportEvent) SetDocumentReferences(v []DocumentReferences)`
 
-SetFacilityCode sets FacilityCode field to given value.
+SetDocumentReferences sets DocumentReferences field to given value.
 
+### HasDocumentReferences
 
-### GetOtherFacility
+`func (o *TransportEvent) HasDocumentReferences() bool`
 
-`func (o *TransportEvent) GetOtherFacility() string`
+HasDocumentReferences returns a boolean if a field has been set.
 
-GetOtherFacility returns the OtherFacility field if non-nil, zero value otherwise.
+### GetReferences
 
-### GetOtherFacilityOk
+`func (o *TransportEvent) GetReferences() []References`
 
-`func (o *TransportEvent) GetOtherFacilityOk() (*string, bool)`
+GetReferences returns the References field if non-nil, zero value otherwise.
 
-GetOtherFacilityOk returns a tuple with the OtherFacility field if it's non-nil, zero value otherwise
+### GetReferencesOk
+
+`func (o *TransportEvent) GetReferencesOk() (*[]References, bool)`
+
+GetReferencesOk returns a tuple with the References field if it's non-nil, zero value otherwise
 and a boolean to check if the value has been set.
 
-### SetOtherFacility
+### SetReferences
 
-`func (o *TransportEvent) SetOtherFacility(v string)`
+`func (o *TransportEvent) SetReferences(v []References)`
 
-SetOtherFacility sets OtherFacility field to given value.
+SetReferences sets References field to given value.
 
-### HasOtherFacility
+### HasReferences
 
-`func (o *TransportEvent) HasOtherFacility() bool`
+`func (o *TransportEvent) HasReferences() bool`
 
-HasOtherFacility returns a boolean if a field has been set.
-
-### GetModeOfTransportCode
-
-`func (o *TransportEvent) GetModeOfTransportCode() string`
-
-GetModeOfTransportCode returns the ModeOfTransportCode field if non-nil, zero value otherwise.
-
-### GetModeOfTransportCodeOk
-
-`func (o *TransportEvent) GetModeOfTransportCodeOk() (*string, bool)`
-
-GetModeOfTransportCodeOk returns a tuple with the ModeOfTransportCode field if it's non-nil, zero value otherwise
-and a boolean to check if the value has been set.
-
-### SetModeOfTransportCode
-
-`func (o *TransportEvent) SetModeOfTransportCode(v string)`
-
-SetModeOfTransportCode sets ModeOfTransportCode field to given value.
-
+HasReferences returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

@@ -799,8 +799,6 @@ components:
             \ SMDG, NMFTA ]"
           example: NMFTA
           type: string
-      required:
-      - vesselIMONumber
       type: object
     apiError:
       example:

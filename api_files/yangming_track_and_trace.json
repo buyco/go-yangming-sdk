@@ -587,9 +587,6 @@
         "description": "The transport event entity is a specialization of the event entity to support specification of data that only applies to a transport event."
       },
       "vessel": {
-        "required": [
-          "vesselIMONumber"
-        ],
         "type": "object",
         "properties": {
           "vesselIMONumber": {
